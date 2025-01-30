@@ -93,14 +93,14 @@ public class MecanumDrivetrain extends SubsystemBase {
             double x = leftStick.getX() * multiplier;
             double y = -leftStick.getY() * multiplier;
 
-            double extensionPosition = bot.getExtension().getPositionCM();
+            //double extensionPosition = bot.getExtension().getPositionCM();
 
             double extensionThreshold = 20;
             double rotationSpeedMultiplier = 1.0;
 
-            if (extensionPosition > extensionThreshold) {
-                rotationSpeedMultiplier = 0.5;
-            }
+            //if (extensionPosition > extensionThreshold) {
+            //    rotationSpeedMultiplier = 0.5;
+            //}
 
             rx *= rotationSpeedMultiplier;
 

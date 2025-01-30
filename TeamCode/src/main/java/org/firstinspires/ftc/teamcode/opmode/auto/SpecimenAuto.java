@@ -20,10 +20,6 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.drive.FollowPathCommand;
-import org.firstinspires.ftc.teamcode.common.intothedeep.BotState;
-import org.firstinspires.ftc.teamcode.common.intothedeep.Direction;
-import org.firstinspires.ftc.teamcode.common.intothedeep.GameElement;
-import org.firstinspires.ftc.teamcode.common.intothedeep.TargetMode;
 
 import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
