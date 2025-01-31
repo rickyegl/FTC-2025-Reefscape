@@ -35,19 +35,21 @@ public class SpecimenAuto2 extends LinearOpMode {
 
     public static Pose startingPose = new Pose(9, 55, 0);
     public static Pose parkPose = new Pose(18, 26, 0);
-    public static Pose score1 = new Pose(38, 83, 0);
-    public static Pose score2 = new Pose(38, 79, Math.toRadians(180));
-    public static Pose score3 = new Pose(38, 75, Math.toRadians(180));
-    public static Pose score4 = new Pose(38, 71, Math.toRadians(180));
-    public static Pose score5 = new Pose(38, 67, Math.toRadians(180));
 
-    public static Pose intake1 = new Pose(17.064935064935064, 40.67532467532467, 0);
+    public static double scoreX = 37;
+    public static Pose score1 = new Pose(scoreX, 83, 0);
+    public static Pose score2 = new Pose(scoreX, 79, 0);
+    public static Pose score3 = new Pose(scoreX, 75, 0);
+    public static Pose score4 = new Pose(scoreX, 71, 0);
+    public static Pose score5 = new Pose(scoreX, 67, 0);
+
+    public static Pose intake1 = new Pose(17.064935064935064, 40.67532467532467, Math.toRadians(-180));
 
     public static double push1Y = 27.584415584415588;
     public static double push2Y = 17.06493506493507;
     public static double push3Y = 9.818181818181825;
 
-    public static double downX = 13.792207792207792;
+    public static double downX = 14;
     public static double upX = 57.740259740259745;
 
 
@@ -94,31 +96,68 @@ public class SpecimenAuto2 extends LinearOpMode {
                                                 //new Point(new Pose(64.05194805194806, 9.818181818181825, Math.toRadians(0)))
                                         )
                                 )
+                                .setConstantHeadingInterpolation(score1.getHeading())
                                 //sample 1
                                 .addPath(
-                                        new BezierCurve(
+                                        new BezierLine(
+                                                new Point(new Pose(upX, 34.36363636363637, Math.toRadians(0))),
+                                                new Point(new Pose(upX, push1Y, Math.toRadians(0)))//lateral 1
+                                        )
+                                )
+                                .setConstantHeadingInterpolation(score1.getHeading())
+                                .addPath(
+                                        new BezierLine(
                                                 new Point(new Pose(upX, push1Y, Math.toRadians(0))),//lateral 1
+                                                new Point(new Pose(downX, push1Y, Math.toRadians(0)))//bajar
+                                        )
+                                )
+                                .setConstantHeadingInterpolation(score1.getHeading())
+                                .addPath(
+                                        new BezierLine(
                                                 new Point(new Pose(downX, push1Y, Math.toRadians(0))),//bajar
                                                 new Point(new Pose(upX, push1Y, Math.toRadians(0)))//subir
                                         )
                                 )
+                                .setConstantHeadingInterpolation(score1.getHeading())
                                 //sample 2
                                 .addPath(
-                                        new BezierCurve(
+                                        new BezierLine(
+                                                new Point(new Pose(upX, push1Y, Math.toRadians(0))),//subir
+                                                new Point(new Pose(upX, push2Y, Math.toRadians(0)))//lateral 2
+                                        )
+                                )
+                                .setConstantHeadingInterpolation(score1.getHeading())
+                                .addPath(
+                                        new BezierLine(
                                                 new Point(new Pose(upX, push2Y, Math.toRadians(0))),//lateral 2
+                                                new Point(new Pose(downX, push2Y, Math.toRadians(0)))//bajar
+                                        )
+                                )
+                                .setConstantHeadingInterpolation(score1.getHeading())
+                                .addPath(
+                                        new BezierLine(
                                                 new Point(new Pose(downX, push2Y, Math.toRadians(0))),//bajar
                                                 new Point(new Pose(upX, push2Y, Math.toRadians(0)))//subir
                                         )
                                 )
-                                //sample 3
+                                .setConstantHeadingInterpolation(score1.getHeading())
 
+                                //sample 3
                                 .addPath(
-                                        new BezierCurve(
+                                        new BezierLine(
+                                                new Point(new Pose(upX, push2Y, Math.toRadians(0))),//subir
+                                                new Point(new Pose(upX, push3Y, Math.toRadians(0)))//lateral 3
+                                        )
+                                )
+                                .setConstantHeadingInterpolation(score1.getHeading())
+                                .addPath(
+                                        new BezierLine(
                                                 new Point(new Pose(upX, push3Y, Math.toRadians(0))),//lateral 3
                                                 new Point(new Pose(downX, push3Y, Math.toRadians(0)))//bajar
                                         )
                                 )
-                                .setLinearHeadingInterpolation(score1.getHeading(), intake1.getHeading())
+                                .setConstantHeadingInterpolation(score1.getHeading())
+                                //.setLinearHeadingInterpolation(score1.getHeading(), intake1.getHeading())
                                 .build()
                         )
                 ),
@@ -131,7 +170,8 @@ public class SpecimenAuto2 extends LinearOpMode {
 
                 new FollowPathCommand(f, f.pathBuilder()
                         .addPath(
-                                new BezierLine(
+                                new BezierCurve(
+                                        new Point(new Pose(downX, push3Y, Math.toRadians(0))),//bajar
                                         new Point(intake1),
                                         new Point(score2)
                                 )
