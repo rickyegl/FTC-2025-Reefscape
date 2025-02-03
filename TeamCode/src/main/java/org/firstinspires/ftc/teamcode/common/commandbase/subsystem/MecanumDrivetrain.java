@@ -6,6 +6,7 @@ import com.arcrobotics.ftclib.controller.PIDFController;
 import com.arcrobotics.ftclib.geometry.Pose2d;
 import com.arcrobotics.ftclib.geometry.Rotation2d;
 import com.arcrobotics.ftclib.geometry.Vector2d;
+import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.localization.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -46,13 +47,18 @@ public class MecanumDrivetrain extends SubsystemBase {
 
         odo.setPosition(pose);
 
-        frontLeft = bot.hMap.get(DcMotorEx.class, "frontLeft");
-        frontRight = bot.hMap.get(DcMotorEx.class, "frontRight");
-        backLeft = bot.hMap.get(DcMotorEx.class, "backLeft");
-        backRight = bot.hMap.get(DcMotorEx.class, "backRight");
+        frontLeft = bot.hMap.get(DcMotorEx.class, "FL");
+        frontRight = bot.hMap.get(DcMotorEx.class, "FR");
+        backLeft = bot.hMap.get(DcMotorEx.class, "BL");
+        backRight = bot.hMap.get(DcMotorEx.class, "BR");
 
-        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        backLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+        frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
         backRight.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        //frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        //backRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
         ascentController = new PIDFController(
                 org.firstinspires.ftc.teamcode.common.Config.ascent_kP,

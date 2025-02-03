@@ -8,7 +8,10 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.BotState;
+import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Extension;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.MecanumDrivetrain;
+import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Pivot;
 
 public class Bot extends Robot {
     private final IMU imu;
@@ -16,7 +19,24 @@ public class Bot extends Robot {
     public final HardwareMap hMap;
     public final Gamepad gamepad;
 
+    public BotState state = BotState.DEPOSIT;
+    private final Pivot pivot;
+    private final Extension extension;
+
     private MecanumDrivetrain drivetrain;
+
+    private Modes mode = Modes.SPECIMENS;
+
+    private Levels level = Levels.Up;
+    public enum Modes {
+        SPECIMENS,
+        SAMPLES,
+    }
+
+    public enum Levels {
+        Up,
+        Down
+    }
 
     public Bot(Telemetry telem, HardwareMap hMap, Gamepad gamepad, boolean enableDrive) {
         this.telem = telem;
@@ -38,6 +58,9 @@ public class Bot extends Robot {
         if (enableDrive) {
             drivetrain = new MecanumDrivetrain(this);
         }
+
+        pivot = new Pivot(this);
+        extension = new Extension(this);
     }
 
     /**
@@ -59,5 +82,22 @@ public class Bot extends Robot {
         drivetrain.setOdoPositionDEG(pose);
     }
 
+    public Pivot getPivot() { return pivot; }
+    public Extension getExtension() { return extension; }
+    public BotState getState() { return state; }
+
+    public void setState(BotState state) { this.state = state; }
+
+    public Modes getMode() { return mode; }
+
+    public void toggleMode() {
+        mode = mode == Modes.SPECIMENS ? Modes.SAMPLES : Modes.SPECIMENS;
+    }
+
+    public Levels getLevel() { return level; }
+
+    public void setLevel(Bot.Levels level) {
+        this.level = level;
+    }
 
 }
