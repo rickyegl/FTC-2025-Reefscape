@@ -72,6 +72,7 @@ public class TeleOp extends CommandOpMode {
                 () -> 1.0
         );
 
+
         //Button fieldCentricToggle = (new GamepadButton(driverGamepad, GamepadKeys.Button.BACK))
         //        .whenPressed(
         //                new ToggleFieldCentricCommand(bot.getDrivetrain())
@@ -81,6 +82,55 @@ public class TeleOp extends CommandOpMode {
 
         //register(drivetrain);
         //drivetrain.setDefaultCommand(driveCommand);
+
+        //region HLock
+        new GamepadButton(driverGamepad, GamepadKeys.Button.DPAD_UP)
+                .whileHeld(
+                        new InstantCommand(()->{
+                            drivetrain.setTargetHeadingDEG(0);
+                            drivetrain.setHeadingLock(true);
+                        })
+                ).whenReleased(
+                        new  InstantCommand(()->{
+                            drivetrain.setHeadingLock(false);
+                        })
+                );
+
+        new GamepadButton(driverGamepad, GamepadKeys.Button.DPAD_RIGHT)
+                .whileHeld(
+                        new InstantCommand(()->{
+                            drivetrain.setTargetHeadingDEG(90);
+                            drivetrain.setHeadingLock(true);
+                        })
+                ).whenReleased(
+                        new  InstantCommand(()->{
+                            drivetrain.setHeadingLock(false);
+                        })
+                );
+
+        new GamepadButton(driverGamepad, GamepadKeys.Button.DPAD_DOWN)
+                .whileHeld(
+                        new InstantCommand(()->{
+                            drivetrain.setTargetHeadingDEG(180);
+                            drivetrain.setHeadingLock(true);
+                        })
+                ).whenReleased(
+                        new  InstantCommand(()->{
+                            drivetrain.setHeadingLock(false);
+                        })
+                );
+
+        new GamepadButton(driverGamepad, GamepadKeys.Button.DPAD_LEFT)
+                .whileHeld(
+                        new InstantCommand(()->{
+                            drivetrain.setTargetHeadingDEG(270);
+                            drivetrain.setHeadingLock(true);
+                        })
+                ).whenReleased(
+                        new  InstantCommand(()->{
+                            drivetrain.setHeadingLock(false);
+                        })
+                );
 
         //endregion
 
@@ -136,7 +186,7 @@ public class TeleOp extends CommandOpMode {
         extension.setDefaultCommand(extensionCommand);
         //endregion
 
-        //Region Actions
+        //region Actions
 
         new GamepadButton(operatorGamepad, GamepadKeys.Button.B)
                 .whileActiveOnce(
@@ -204,10 +254,9 @@ public class TeleOp extends CommandOpMode {
                 );
 
 
-
         //endregion
 
-        //Region Settings
+        //region Settings
 
         new GamepadButton(operatorGamepad, GamepadKeys.Button.BACK).whenPressed(
                 new InstantCommand(()->{

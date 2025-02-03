@@ -31,6 +31,11 @@ public class MecanumDrivetrain extends SubsystemBase {
 
     private static final double TICKS_PER_CM = 384.5 / 11.2;
     private double setPointCM = 0.0;
+
+    private final PIDFController headingController;
+
+    private double targetHeadingRadians;
+
     private static final double hangCM = 45.0;
 
     public MecanumDrivetrain(Bot bot) {
@@ -65,6 +70,13 @@ public class MecanumDrivetrain extends SubsystemBase {
                 org.firstinspires.ftc.teamcode.common.Config.ascent_kI,
                 org.firstinspires.ftc.teamcode.common.Config.ascent_kD,
                 org.firstinspires.ftc.teamcode.common.Config.ascent_kF
+        );
+
+        headingController = new PIDFController(
+                org.firstinspires.ftc.teamcode.common.Config.heading_kP,
+                org.firstinspires.ftc.teamcode.common.Config.heading_kI,
+                org.firstinspires.ftc.teamcode.common.Config.heading_kD,
+                org.firstinspires.ftc.teamcode.common.Config.heading_kF
         );
     }
 
@@ -109,6 +121,20 @@ public class MecanumDrivetrain extends SubsystemBase {
             //}
 
             rx *= rotationSpeedMultiplier;
+
+            if (headingLock) {
+                double currentHeading = pose.getHeading(AngleUnit.RADIANS);
+                // Calculate minimal angle error
+                double error = currentHeading - targetHeadingRadians;
+                error = ((error + Math.PI) % (2 * Math.PI)) - Math.PI;
+
+                // Compute PID correction
+                rx = -headingController.calculate(0, error); // Invert to correct direction
+
+                // Clamp the output to [-1, 1]
+                rx = Math.max(Math.min(rx, 1.0), -1.0);
+            }
+
 
             if (!fieldCentric) {
                 y *= 1.1; // counteract imperfect strafe
@@ -174,12 +200,18 @@ public class MecanumDrivetrain extends SubsystemBase {
         resetEncoders();
         isEncoderMode = mode;
     }
-
-    // TODO: Try to implement heading lock
     public void toggleHeadingLock() {
         headingLock = !headingLock;
     }
 
+    public void setHeadingLock(boolean headingLock) {
+        MecanumDrivetrain.headingLock = headingLock;
+        if (headingLock) {
+            // Capture current heading as target when enabling lock
+            targetHeadingRadians = pose.getHeading(AngleUnit.RADIANS);
+            headingController.reset(); // Reset integral sum and previous error
+        }
+    }
     public void toggleFieldCentric() {
         fieldCentric = !fieldCentric;
     }
@@ -235,5 +267,9 @@ public class MecanumDrivetrain extends SubsystemBase {
         );
 
         odo.setPosition(pose2D);
+    }
+
+    public void setTargetHeadingDEG(double targetHeading) {
+        targetHeadingRadians = Math.toRadians(targetHeading);
     }
 }
