@@ -27,6 +27,8 @@ public class Bot extends Robot {
 
     private Modes mode = Modes.SPECIMENS;
 
+    public boolean climbing = false;
+
     private Levels level = Levels.Up;
     public enum Modes {
         SPECIMENS,

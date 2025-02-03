@@ -9,6 +9,7 @@ import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
+import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.arcrobotics.ftclib.command.button.Button;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
@@ -200,7 +201,7 @@ public class TeleOp extends CommandOpMode {
                 .whenReleased(
                     new SequentialCommandGroup(
                             new SetExtensionCommand(extension, 0)
-                    ).interruptOn(() -> driverGamepad.getButton(GamepadKeys.Button.B))
+                    )/*.interruptOn(() -> driverGamepad.getButton(GamepadKeys.Button.B))*/
                 );
 
 
@@ -250,7 +251,7 @@ public class TeleOp extends CommandOpMode {
                 .whenReleased(
                         new SequentialCommandGroup(
                                 new SetExtensionCommand(extension, 0)
-                        ).interruptOn(() -> driverGamepad.getButton(GamepadKeys.Button.X))
+                        )/*.interruptOn(() -> driverGamepad.getButton(GamepadKeys.Button.X))*/
                 );
 
 
@@ -284,13 +285,13 @@ public class TeleOp extends CommandOpMode {
         schedule(
                 new ParallelCommandGroup(
                         new SetBotStateCommand(bot, BotState.INTAKE),
-                        new SetExtensionCommand(bot.getExtension(), 100),
-                        new SetPivotAngleCommand(bot.getPivot(), 113)
+                        new SetExtensionCommand(bot.getExtension(), 0),
+                        new SetPivotAngleCommand(bot.getPivot(), 90)
                 )
         );
 
         while (opModeInInit()){
-            //bot.telem.addData("Pivot Angle", pivot.getPositionDEG());
+            bot.telem.addData("Pivot Angle", pivot.getPositionDEG());
             //bot.telem.addData("Pivot AngleT", pivot.getPositionT());
             //bot.telem.addData("Pivot LPosition", pivot.pivotMotorL.getCurrentPosition());
             //bot.telem.addData("Pivot RPosition", pivot.pivotMotorR.getCurrentPosition());
@@ -298,6 +299,34 @@ public class TeleOp extends CommandOpMode {
             bot.telem.addData("ViperR", extension.topExtensionMotor.getCurrentPosition());
             bot.telem.update();
         }
+
+        //endregion
+
+        //region Climb
+        new GamepadButton(operatorGamepad, GamepadKeys.Button.LEFT_STICK_BUTTON).whileActiveOnce(
+                new SequentialCommandGroup(
+                        new ParallelCommandGroup(
+                                new SetExtensionCommand(extension,1),
+                                new SetPivotAngleCommand(pivot,1)
+                        ),
+                        new WaitUntilCommand(()->operatorGamepad.getButton(GamepadKeys.Button.RIGHT_STICK_BUTTON)),
+                        new InstantCommand(()->{bot.climbing = true;}),
+                        new SetPivotAngleCommand(pivot,2),
+                        new SetExtensionCommand(extension,2),
+                        new SetPivotAngleCommand(pivot,3)
+                )
+        );
+
+        new GamepadButton(operatorGamepad, GamepadKeys.Button.LEFT_STICK_BUTTON).whenReleased(
+                new ConditionalCommand(
+                        new WaitCommand(0),
+                        new ParallelCommandGroup(
+                                new SetExtensionCommand(extension,1),
+                                new SetPivotAngleCommand(pivot,1)
+                        ),
+                        () -> bot.climbing
+                )
+        );
 
         //endregion
 

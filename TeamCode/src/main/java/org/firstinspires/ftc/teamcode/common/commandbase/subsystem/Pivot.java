@@ -22,7 +22,7 @@ public class Pivot extends SubsystemBase {
     public final DcMotor pivotMotorR;
     private DcMotorEx pivotEncoder;
 
-    public static final double setpoint_intaking = 100, setpoint_vertical = 0, setpoint_horizontal = 90;
+    public static final double setpoint_intaking = 100, setpoint_vertical = 0, setpoint_horizontal = 87;
 
     private final PIDFController pivotController;
     public double setpointDEG = 0.0, minAngle = 0.0, maxAngle = 113;
@@ -49,16 +49,16 @@ public class Pivot extends SubsystemBase {
                 Config.pivot_kP,
                 Config.pivot_kI,
                 Config.pivot_kD,
-                Config.pivot_min_kF
+                Config.pivot_n_kF
         );
     }
 
     @Override
     public void periodic() {
-        double kFConstant = (Config.pivot_max_kF - Config.pivot_min_kF) / depositMaxExtension;
+        double kFConstant = (Config.pivot_maxH_kF - Config.pivot_h_kF) / depositMaxExtension;
         double extensionFF = (kFConstant * (bot.getExtension().getPositionCM()));
         double pivotFF  = (Math.cos(pivotEncoder.getCurrentPosition() - Math.toRadians(60)));
-        double calculatedKf = ((extensionFF + Config.pivot_min_kF) * pivotFF);
+        double calculatedKf = ((extensionFF + Config.pivot_h_kF) * pivotFF);
         pivotController.setF(calculatedKf);
 
         double power = pivotController.calculate(
