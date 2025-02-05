@@ -23,7 +23,7 @@ public class MecanumDrivetrain extends SubsystemBase {
     private final DcMotorEx frontLeft, frontRight, backLeft, backRight;
     private final PIDFController ascentController;
     private GoBildaPinpointDriver odo;
-    public static boolean fieldCentric = false, headingLock = false;
+    public static boolean fieldCentric = true, headingLock = false;
 
     public static Pose2D pose;
 
@@ -99,6 +99,10 @@ public class MecanumDrivetrain extends SubsystemBase {
 
         odo.update();
         pose = odo.getPosition();
+
+        bot.telem.addData("EncoderMode",isEncoderMode);
+        bot.telem.addData("FieldCentric",fieldCentric);
+
         //bot.telem.addData("Pose",
         //        "X: " + pose.getX(DistanceUnit.MM) +
         //                ", Y: " + pose.getY(DistanceUnit.MM) +

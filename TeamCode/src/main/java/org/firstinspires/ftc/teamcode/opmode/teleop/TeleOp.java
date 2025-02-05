@@ -23,10 +23,15 @@ import org.firstinspires.ftc.teamcode.common.Bot;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.drive.TeleOpDriveCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.extension.ManualExtensionCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.extension.SetExtensionCommand;
+import org.firstinspires.ftc.teamcode.common.commandbase.command.intake.IntakeInCommand;
+import org.firstinspires.ftc.teamcode.common.commandbase.command.intake.IntakeOutCommand;
+import org.firstinspires.ftc.teamcode.common.commandbase.command.intake.IntakeStopCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.pivot.ManualPivotCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.pivot.SetPivotAngleCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.state.SetBotStateCommand;
+import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Claw;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Extension;
+import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Intake;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.MecanumDrivetrain;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Pivot;
 import org.firstinspires.ftc.teamcode.Direction;
@@ -37,9 +42,12 @@ public class TeleOp extends CommandOpMode {
     private Bot bot;
     private Pivot pivot;
     private Extension extension;
+
+    private Intake intake;
+    private Claw claw;
     private MecanumDrivetrain drivetrain;
 
-    private boolean enableDrive = false;
+    private boolean enableDrive = true;
 
     private GamepadEx driverGamepad;
     private GamepadEx operatorGamepad;
@@ -49,6 +57,7 @@ public class TeleOp extends CommandOpMode {
     // Gamepad layout
     // https://www.padcrafter.com/?templates=Gamepad+1%2FDriver+Gamepad&plat=1&col=%23242424%2C%23606A6E%2C%23FFFFFF&rightStick=Yaw%2FRotation&leftStick=Translation&dpadUp=Wrist+Up&dpadRight=Wrist+Clockwise&dpadLeft=Wrist+Counter-Clockwise&dpadDown=Wrist+Down&aButton=Toggle+Claw&yButton=Sample%2FSpecimen+Auto+Deposit&xButton=Robot+State+Toggle&bButton=Sample%2FSpecimen+State+Toggle&rightTrigger=Extension+Out&leftTrigger=Extension+In&leftBumper=Pivot+Down&rightBumper=Pivot+Up&backButton=Red+%3D+Sample%2C+Blue+%3D+Specimen%2C+Green+%3D+Ascent&startButton=Options+%3D+Ascent    @Override
     public void initialize() {
+
 
         CommandScheduler.getInstance().reset();
 
@@ -70,7 +79,7 @@ public class TeleOp extends CommandOpMode {
                 () -> -driverGamepad.getRightX(),
                 () -> driverGamepad.getLeftY(),
                 () -> -driverGamepad.getLeftX(),
-                () -> 1.0
+                () -> bot.speed
         );
 
 
@@ -81,31 +90,31 @@ public class TeleOp extends CommandOpMode {
 
 
 
-        //register(drivetrain);
-        //drivetrain.setDefaultCommand(driveCommand);
+        register(drivetrain);
+        drivetrain.setDefaultCommand(driveCommand);
+
+        intake = bot.getIntake();
+        claw = bot.getClaw();
+        register(intake);
+        register(claw);
 
         //region HLock
+        double basketAngle = 180+45;
+        double transformangle = -45;
+
         new GamepadButton(driverGamepad, GamepadKeys.Button.DPAD_UP)
                 .whileHeld(
                         new InstantCommand(()->{
                             drivetrain.setTargetHeadingDEG(0);
                             drivetrain.setHeadingLock(true);
                         })
-                ).whenReleased(
-                        new  InstantCommand(()->{
-                            drivetrain.setHeadingLock(false);
-                        })
                 );
 
         new GamepadButton(driverGamepad, GamepadKeys.Button.DPAD_RIGHT)
                 .whileHeld(
                         new InstantCommand(()->{
-                            drivetrain.setTargetHeadingDEG(90);
+                            drivetrain.setTargetHeadingDEG(transformangle);
                             drivetrain.setHeadingLock(true);
-                        })
-                ).whenReleased(
-                        new  InstantCommand(()->{
-                            drivetrain.setHeadingLock(false);
                         })
                 );
 
@@ -115,23 +124,65 @@ public class TeleOp extends CommandOpMode {
                             drivetrain.setTargetHeadingDEG(180);
                             drivetrain.setHeadingLock(true);
                         })
-                ).whenReleased(
-                        new  InstantCommand(()->{
-                            drivetrain.setHeadingLock(false);
-                        })
                 );
 
         new GamepadButton(driverGamepad, GamepadKeys.Button.DPAD_LEFT)
                 .whileHeld(
                         new InstantCommand(()->{
-                            drivetrain.setTargetHeadingDEG(270);
+                            drivetrain.setTargetHeadingDEG(basketAngle);
                             drivetrain.setHeadingLock(true);
                         })
-                ).whenReleased(
-                        new  InstantCommand(()->{
-                            drivetrain.setHeadingLock(false);
-                        })
                 );
+
+        if(driverGamepad != operatorGamepad){
+            new GamepadButton(driverGamepad, GamepadKeys.Button.Y)
+                    .whileHeld(
+                            new InstantCommand(()->{
+                                drivetrain.setTargetHeadingDEG(0);
+                                drivetrain.setHeadingLock(true);
+                            })
+                    ).whenReleased(
+                            new  InstantCommand(()->{
+                                drivetrain.setHeadingLock(false);
+                            })
+                    );
+
+            new GamepadButton(driverGamepad, GamepadKeys.Button.B)
+                    .whileHeld(
+                            new InstantCommand(()->{
+                                drivetrain.setTargetHeadingDEG(transformangle);
+                                drivetrain.setHeadingLock(true);
+                            })
+                    ).whenReleased(
+                            new  InstantCommand(()->{
+                                drivetrain.setHeadingLock(false);
+                            })
+                    );
+
+            new GamepadButton(driverGamepad, GamepadKeys.Button.A)
+                    .whileHeld(
+                            new InstantCommand(()->{
+                                drivetrain.setTargetHeadingDEG(180);
+                                drivetrain.setHeadingLock(true);
+                            })
+                    ).whenReleased(
+                            new  InstantCommand(()->{
+                                drivetrain.setHeadingLock(false);
+                            })
+                    );
+
+            new GamepadButton(driverGamepad, GamepadKeys.Button.X)
+                    .whileHeld(
+                            new InstantCommand(()->{
+                                drivetrain.setTargetHeadingDEG(basketAngle);
+                                drivetrain.setHeadingLock(true);
+                            })
+                    ).whenReleased(
+                            new  InstantCommand(()->{
+                                drivetrain.setHeadingLock(false);
+                            })
+                    );
+        }
 
         //endregion
 
@@ -205,7 +256,6 @@ public class TeleOp extends CommandOpMode {
                 );
 
 
-
         new GamepadButton(driverGamepad, GamepadKeys.Button.Y)
                 .whenPressed(
                         new ConditionalCommand(
@@ -218,7 +268,8 @@ public class TeleOp extends CommandOpMode {
                                 new ConditionalCommand(
                                         //if depositing
                                         new SequentialCommandGroup(
-                                                new WaitCommand(0)
+                                                new IntakeOutCommand(intake),
+                                                new WaitCommand(700)
                                         ),
                                         //if not intaking or depositing
                                         new WaitCommand(0),
@@ -240,7 +291,9 @@ public class TeleOp extends CommandOpMode {
                                 ),
                                 //Samples
                                 new SequentialCommandGroup(
+                                        new SetPivotAngleCommand(pivot, Pivot.setpoint_vertical),
                                         new SetExtensionCommand(extension, extension.getSamplesTarget())
+
                                 ),
                                 () -> bot.getMode() == Bot.Modes.SPECIMENS
                         )
@@ -257,9 +310,19 @@ public class TeleOp extends CommandOpMode {
 
         //endregion
 
+        //region Intake
+
+        //endregion
+
         //region Settings
 
         new GamepadButton(operatorGamepad, GamepadKeys.Button.BACK).whenPressed(
+                new InstantCommand(()->{
+                    bot.toggleMode();
+                })
+        );
+
+        new GamepadButton(driverGamepad, GamepadKeys.Button.BACK).whenPressed(
                 new InstantCommand(()->{
                     bot.toggleMode();
                 })
@@ -277,6 +340,65 @@ public class TeleOp extends CommandOpMode {
                 })
         );
 
+        //endregion
+
+        //region Climb
+        new GamepadButton(operatorGamepad, GamepadKeys.Button.LEFT_STICK_BUTTON).whileActiveOnce(
+                new SequentialCommandGroup(
+                        new ParallelCommandGroup(
+                                new SetExtensionCommand(extension,1325),
+                                new SetPivotAngleCommand(pivot,39)
+                        ),
+                        new WaitUntilCommand(()->operatorGamepad.getButton(GamepadKeys.Button.RIGHT_STICK_BUTTON)),
+                        new InstantCommand(()->{
+                            bot.climbing = true;
+                        }),
+                        new InstantCommand(()->{
+                            // pivot.multiplyP();
+                        }),
+                        new SetPivotAngleCommand(pivot,44),
+                        new ParallelCommandGroup(
+                                new InstantCommand(()->{
+                                    //extension.multiplyP();
+                                }),
+                                new SequentialCommandGroup(
+                                        new SetExtensionCommand(extension,-5),
+                                        new InstantCommand(()->{
+                                            //extension.multiplyP();
+                                        })
+                                ),
+
+                                new SetPivotAngleCommand(pivot,110)
+                        )
+
+                )
+        );
+
+        new GamepadButton(operatorGamepad, GamepadKeys.Button.LEFT_STICK_BUTTON).whenReleased(
+                new ConditionalCommand(
+                        new WaitCommand(0),
+                        new ParallelCommandGroup(
+                                new SetExtensionCommand(extension,1),
+                                new SetPivotAngleCommand(pivot,1)
+                        ),
+                        () -> bot.climbing
+                )
+        );
+
+        //endregion
+
+        //region Test
+        new GamepadButton(operatorGamepad, GamepadKeys.Button.LEFT_BUMPER).whileHeld(
+                new InstantCommand(()->{intake.in();})
+        ).whenReleased(
+                new InstantCommand(()->{intake.stop();})
+        );
+
+        new GamepadButton(operatorGamepad, GamepadKeys.Button.RIGHT_BUMPER).whileHeld(
+                new InstantCommand(()->{intake.out();})
+        ).whenReleased(
+                new InstantCommand(()->{intake.stop();})
+        );
         //endregion
 
         //region Automation
@@ -302,33 +424,6 @@ public class TeleOp extends CommandOpMode {
 
         //endregion
 
-        //region Climb
-        new GamepadButton(operatorGamepad, GamepadKeys.Button.LEFT_STICK_BUTTON).whileActiveOnce(
-                new SequentialCommandGroup(
-                        new ParallelCommandGroup(
-                                new SetExtensionCommand(extension,1),
-                                new SetPivotAngleCommand(pivot,1)
-                        ),
-                        new WaitUntilCommand(()->operatorGamepad.getButton(GamepadKeys.Button.RIGHT_STICK_BUTTON)),
-                        new InstantCommand(()->{bot.climbing = true;}),
-                        new SetPivotAngleCommand(pivot,2),
-                        new SetExtensionCommand(extension,2),
-                        new SetPivotAngleCommand(pivot,3)
-                )
-        );
-
-        new GamepadButton(operatorGamepad, GamepadKeys.Button.LEFT_STICK_BUTTON).whenReleased(
-                new ConditionalCommand(
-                        new WaitCommand(0),
-                        new ParallelCommandGroup(
-                                new SetExtensionCommand(extension,1),
-                                new SetPivotAngleCommand(pivot,1)
-                        ),
-                        () -> bot.climbing
-                )
-        );
-
-        //endregion
 
     }
 

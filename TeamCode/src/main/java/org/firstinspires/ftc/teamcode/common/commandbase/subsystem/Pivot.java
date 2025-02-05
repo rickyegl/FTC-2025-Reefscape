@@ -20,9 +20,8 @@ public class Pivot extends SubsystemBase {
 
     public final DcMotor pivotMotorL;
     public final DcMotor pivotMotorR;
-    private DcMotorEx pivotEncoder;
 
-    public static final double setpoint_intaking = 100, setpoint_vertical = 0, setpoint_horizontal = 87;
+    public static final double setpoint_intaking = 100, setpoint_vertical = 6, setpoint_horizontal = 87;
 
     private final PIDFController pivotController;
     public double setpointDEG = 0.0, minAngle = 0.0, maxAngle = 113;
@@ -33,17 +32,16 @@ public class Pivot extends SubsystemBase {
 
         pivotMotorL = bot.hMap.get(DcMotor.class, "angleML");
         pivotMotorR = bot.hMap.get(DcMotor.class, "angleMR");
-        pivotEncoder = bot.hMap.get(DcMotorEx.class, "angleML");
 
         pivotMotorL.setDirection(DcMotorSimple.Direction.FORWARD);
         pivotMotorR.setDirection(DcMotorSimple.Direction.REVERSE);
-        pivotEncoder.setDirection(DcMotorSimple.Direction.REVERSE);
 
         //pivotEncoder = new AbsoluteAnalogEncoder(
         //        bot.hMap.get(AnalogInput.class, "pivotEncoder")
         //);
 
-        pivotEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        pivotMotorL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        pivotMotorL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         pivotController = new PIDFController(
                 Config.pivot_kP,
@@ -57,7 +55,7 @@ public class Pivot extends SubsystemBase {
     public void periodic() {
         double kFConstant = (Config.pivot_maxH_kF - Config.pivot_h_kF) / depositMaxExtension;
         double extensionFF = (kFConstant * (bot.getExtension().getPositionCM()));
-        double pivotFF  = (Math.cos(pivotEncoder.getCurrentPosition() - Math.toRadians(60)));
+        double pivotFF  = (Math.cos(pivotMotorL.getCurrentPosition() - Math.toRadians(60)));
         double calculatedKf = ((extensionFF + Config.pivot_h_kF) * pivotFF);
         pivotController.setF(calculatedKf);
 
@@ -65,8 +63,9 @@ public class Pivot extends SubsystemBase {
                 getPositionDEG(),
                 setpointDEG
         );
+        pivotMotorR.setPower(-power);
         pivotMotorL.setPower(power);
-        pivotMotorR.setPower(power);
+
 
         bot.telem.addData("Pivot Angle", getPositionDEG());
         bot.telem.addData("Pivot LPosition", pivotMotorL.getCurrentPosition());
@@ -111,7 +110,7 @@ public class Pivot extends SubsystemBase {
     }
 
     public double getPositionT() {
-        return (pivotEncoder.getCurrentPosition());
+        return (pivotMotorL.getCurrentPosition());
     }
 
     /**
@@ -119,7 +118,7 @@ public class Pivot extends SubsystemBase {
      * @return the position in radians
      */
     public double getPositionRAD() {
-        return ((pivotEncoder.getCurrentPosition() / 8192.0) * 2 * Math.PI);
+        return ((pivotMotorL.getCurrentPosition() / 8192.0) * 2 * Math.PI);
     }
 
     public void setSetpointHorizontal() {
@@ -128,5 +127,9 @@ public class Pivot extends SubsystemBase {
 
     public void setSetpointVertical() {
         setpointDEG = setpoint_vertical;
+    }
+
+    public void multiplyP(){
+        pivotController.setP(pivotController.getP()*4);
     }
 }

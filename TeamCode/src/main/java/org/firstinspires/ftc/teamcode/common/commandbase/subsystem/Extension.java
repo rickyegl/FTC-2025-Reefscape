@@ -16,7 +16,7 @@ public class Extension extends SubsystemBase {
     public final DcMotor bottomExtensionMotor, topExtensionMotor;
 
     private final PIDFController extensionController;
-    public static double setpointCM = 0.0, highChamberTarget = 2500.0, lowChamberTarget = 17.0, lowBasketTarget = 20.0, highBasketTarget = 60.0, ticksperCM = 1;//10.37339803;
+    public static double setpointCM = 0.0, highChamberTarget = 2500.0, lowChamberTarget = 17.0, lowBasketTarget = 20.0, highBasketTarget = 3200, ticksperCM = 1;//10.37339803;
     public static double minExtension = 0.0, depositMaxExtension = 30, intakeMaxExtension = 40;
     public double getChamberTarget() {
         if (bot.getLevel() == Bot.Levels.Up) {
@@ -38,7 +38,7 @@ public class Extension extends SubsystemBase {
         this.bot = bot;
 
         bottomExtensionMotor = bot.hMap.get(DcMotor.class, "viperL");
-        bottomExtensionMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        bottomExtensionMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         bottomExtensionMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         bottomExtensionMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -114,6 +114,13 @@ public class Extension extends SubsystemBase {
      */
     public double getMinExtension() {
         return minExtension;
+    }
+
+    public void multiplyP(){
+        extensionController.setP(extensionController.getP()*4);
+    }
+    public void resetP(){
+        extensionController.setP(Config.extension_kP);
     }
 
 }

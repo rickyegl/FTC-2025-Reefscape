@@ -9,7 +9,9 @@ import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.BotState;
+import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Claw;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Extension;
+import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Intake;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.MecanumDrivetrain;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Pivot;
 
@@ -23,11 +25,17 @@ public class Bot extends Robot {
     private final Pivot pivot;
     private final Extension extension;
 
+    private final Intake intake;
+
+    private final Claw claw;
+
     private MecanumDrivetrain drivetrain;
 
-    private Modes mode = Modes.SPECIMENS;
+    private Modes mode = Modes.SAMPLES;
 
     public boolean climbing = false;
+
+    public double speed = 0.7;
 
     private Levels level = Levels.Up;
     public enum Modes {
@@ -63,6 +71,8 @@ public class Bot extends Robot {
 
         pivot = new Pivot(this);
         extension = new Extension(this);
+        intake = new Intake(this);
+        claw = new Claw(this);
     }
 
     /**
@@ -86,6 +96,8 @@ public class Bot extends Robot {
 
     public Pivot getPivot() { return pivot; }
     public Extension getExtension() { return extension; }
+    public Intake getIntake() { return intake; }
+    public Claw getClaw() { return claw; }
     public BotState getState() { return state; }
 
     public void setState(BotState state) { this.state = state; }
