@@ -21,10 +21,10 @@ public class Pivot extends SubsystemBase {
     public final DcMotor pivotMotorL;
     public final DcMotor pivotMotorR;
 
-    public static final double setpoint_intaking = 100, setpoint_vertical = 6, setpoint_horizontal = 87;
+    public static final double setpoint_intaking = 100, setpoint_vertical = 0, setpoint_horizontal = 90;
 
     private final PIDFController pivotController;
-    public double setpointDEG = 0.0, minAngle = 0.0, maxAngle = 113;
+    public double setpointDEG = 0.0, minAngle = 0.0, maxAngle = 107;
     private final double encoderOffset = -113.0;
 
     public Pivot(Bot bot) {

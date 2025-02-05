@@ -1,26 +1,28 @@
-package org.firstinspires.ftc.teamcode.common.commandbase.command.intake;
+package org.firstinspires.ftc.teamcode.common.commandbase.command.claw;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 
+import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Claw;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Intake;
-
-import java.util.function.DoubleSupplier;
 
 
 /**
  * ManualExtensionCommand is a command that allows the driver to manually control the extension
  * Positive speed extends the extension, negative speed retracts the extension
  */
-public class IntakeStopCommand extends CommandBase {
+public class SetClawCommand extends CommandBase {
 
-    private final Intake intake;
-    public IntakeStopCommand(Intake intake) {
-        this.intake = intake;
+    private final Claw claw;
+    private final double position;
+
+    public SetClawCommand(Claw claw, double position) {
+        this.claw = claw;
+        this.position = position;
     }
 
     @Override
     public void initialize() {
-        intake.stop();
+        claw.setPosition(position);
     }
 
     @Override

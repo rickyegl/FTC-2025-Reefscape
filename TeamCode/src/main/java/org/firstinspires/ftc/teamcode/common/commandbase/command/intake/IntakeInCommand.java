@@ -19,7 +19,12 @@ public class IntakeInCommand extends CommandBase {
     }
 
     @Override
-    public void execute() {
+    public void initialize() {
         intake.in();
+    }
+
+    @Override
+    public boolean isFinished() {
+        return true;
     }
 }

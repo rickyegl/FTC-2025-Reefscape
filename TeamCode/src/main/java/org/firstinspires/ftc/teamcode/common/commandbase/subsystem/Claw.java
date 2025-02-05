@@ -12,7 +12,9 @@ public class Claw extends SubsystemBase {
     private final Bot bot;
 
     public final Servo clawPivot;
-    private double currentPosition = 0.4;
+    private double currentPosition = placing;
+
+    public static double placing = 0.4, safe = 0.2, intaking = 0;
 
     public Claw(Bot bot) {
         this.bot = bot;
@@ -24,14 +26,8 @@ public class Claw extends SubsystemBase {
         clawPivot.setPosition(currentPosition);
     }
 
-    public enum ClawState {
-        PLACING(0.5);
-
-        public final double pos;
-
-        private ClawState (double pos) {
-            this.pos = pos;
-        }
+    public void setPosition(double position){
+        currentPosition = position;
     }
 
 }

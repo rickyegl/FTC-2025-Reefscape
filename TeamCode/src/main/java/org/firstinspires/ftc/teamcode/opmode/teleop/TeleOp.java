@@ -20,6 +20,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.BotState;
 import org.firstinspires.ftc.teamcode.common.Bot;
+import org.firstinspires.ftc.teamcode.common.commandbase.command.claw.SetClawCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.drive.TeleOpDriveCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.extension.ManualExtensionCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.extension.SetExtensionCommand;
@@ -42,11 +43,9 @@ public class TeleOp extends CommandOpMode {
     private Bot bot;
     private Pivot pivot;
     private Extension extension;
-
     private Intake intake;
     private Claw claw;
     private MecanumDrivetrain drivetrain;
-
     private boolean enableDrive = true;
 
     private GamepadEx driverGamepad;
@@ -244,11 +243,12 @@ public class TeleOp extends CommandOpMode {
                 .whileActiveOnce(
                         new SequentialCommandGroup(
                                 new SetPivotAngleCommand(pivot, Pivot.setpoint_horizontal),
-                                new SetExtensionCommand(extension, Extension.intakeMaxExtension)
+                                new SetExtensionCommand(extension, Extension.intakeMaxExtension),
+                                new SetClawCommand(claw, Claw.intaking)
                         )
                 );
 
-        new GamepadButton(driverGamepad, GamepadKeys.Button.B)
+        new GamepadButton(operatorGamepad, GamepadKeys.Button.B)
                 .whenReleased(
                     new SequentialCommandGroup(
                             new SetExtensionCommand(extension, 0)
@@ -256,20 +256,36 @@ public class TeleOp extends CommandOpMode {
                 );
 
 
-        new GamepadButton(driverGamepad, GamepadKeys.Button.Y)
+        //Define Y Action
+        new GamepadButton(operatorGamepad, GamepadKeys.Button.Y)
                 .whenPressed(
                         new ConditionalCommand(
                                 //if intaking
                                 new SequentialCommandGroup(
                                         new SetPivotAngleCommand(pivot, Pivot.setpoint_intaking),
-                                        new WaitCommand(500),
+                                        new WaitCommand(600),
                                         new SetPivotAngleCommand(pivot, Pivot.setpoint_horizontal)
                                 ),
                                 new ConditionalCommand(
                                         //if depositing
-                                        new SequentialCommandGroup(
-                                                new IntakeOutCommand(intake),
-                                                new WaitCommand(700)
+                                        new ConditionalCommand(
+                                                //Put Specimen
+                                                new SequentialCommandGroup(
+                                                        new SetExtensionCommand(extension,extension.getSetpointCM()-300),
+                                                        new IntakeOutCommand(intake),
+                                                        new WaitCommand(5000),
+                                                        new IntakeStopCommand(intake)
+                                                ),
+                                                //Put Sample
+                                                new SequentialCommandGroup(
+                                                        new IntakeOutCommand(intake),
+                                                        new WaitCommand(700),
+                                                        new SetClawCommand(claw,Claw.safe),
+                                                        new IntakeStopCommand(intake),
+                                                        new WaitCommand(200),
+                                                        new SetExtensionCommand(extension,0)
+                                                ),
+                                                () -> bot.getMode() == Bot.Modes.SPECIMENS
                                         ),
                                         //if not intaking or depositing
                                         new WaitCommand(0),
@@ -280,19 +296,24 @@ public class TeleOp extends CommandOpMode {
 
                 );
 
-        //deposit sample/specimen
+        //start deposit sample/specimen
         new GamepadButton(driverGamepad, GamepadKeys.Button.X)
                 .whileActiveOnce(
                         new ConditionalCommand(
                                 //Specimens
                                 new SequentialCommandGroup(
+                                        new SetClawCommand(claw, Claw.safe),
                                         new SetPivotAngleCommand(pivot, Pivot.setpoint_vertical),
-                                        new SetExtensionCommand(extension, extension.getChamberTarget())
+                                        new SetExtensionCommand(extension, extension.getBarTarget()),
+                                        new SetClawCommand(claw, Claw.placing)
                                 ),
                                 //Samples
                                 new SequentialCommandGroup(
+                                        new SetClawCommand(claw, Claw.safe),
                                         new SetPivotAngleCommand(pivot, Pivot.setpoint_vertical),
-                                        new SetExtensionCommand(extension, extension.getSamplesTarget())
+                                        new SetExtensionCommand(extension, extension.getSamplesTarget()),
+                                        new SetClawCommand(claw, Claw.placing)
+
 
                                 ),
                                 () -> bot.getMode() == Bot.Modes.SPECIMENS
@@ -300,9 +321,11 @@ public class TeleOp extends CommandOpMode {
 
                 );
 
+        //extension release
         new GamepadButton(driverGamepad, GamepadKeys.Button.X)
                 .whenReleased(
                         new SequentialCommandGroup(
+                                new SetClawCommand(claw, Claw.safe),
                                 new SetExtensionCommand(extension, 0)
                         )/*.interruptOn(() -> driverGamepad.getButton(GamepadKeys.Button.X))*/
                 );
