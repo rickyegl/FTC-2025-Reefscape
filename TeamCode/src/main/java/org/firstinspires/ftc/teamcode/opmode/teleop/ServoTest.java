@@ -16,7 +16,6 @@ public class ServoTest extends CommandOpMode {
     private GamepadEx driverGamepad;
 
     private MultipleTelemetry telem;
-    private Bot bot;
 
     private Servo servo;
 
@@ -26,18 +25,18 @@ public class ServoTest extends CommandOpMode {
 
         //driverGamepad = new GamepadEx(gamepad1);
 
-        servo = bot.hMap.get(Servo.class, "claw");
+        servo = hardwareMap.get(Servo.class, "claw");
 
         waitForStart();
         while (opModeIsActive()){
-            servo.setPosition(PivotFConfig.position);
+            servo.setPosition(ServoTestConfig.position);
         }
 
     }
 
     @com.acmerobotics.dashboard.config.Config
-    public static class PivotFConfig {
-        public static double position = 0.5;
+    public static class ServoTestConfig {
+        public static double position = 1;
 
     }
 

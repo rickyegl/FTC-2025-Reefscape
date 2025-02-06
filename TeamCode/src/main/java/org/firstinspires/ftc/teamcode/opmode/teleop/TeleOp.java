@@ -75,9 +75,9 @@ public class TeleOp extends CommandOpMode {
 
         TeleOpDriveCommand driveCommand = new TeleOpDriveCommand(
                 drivetrain,
-                () -> -driverGamepad.getRightX(),
-                () -> driverGamepad.getLeftY(),
-                () -> -driverGamepad.getLeftX(),
+                () -> driverGamepad.getRightX(),
+                () -> -driverGamepad.getLeftY(),
+                () -> driverGamepad.getLeftX(),
                 () -> bot.speed
         );
 
@@ -224,10 +224,10 @@ public class TeleOp extends CommandOpMode {
         Button togglePivot = (new GamepadButton(operatorGamepad, GamepadKeys.Button.A))
                 .whenPressed(
                         new InstantCommand(()->{
-                            if(pivot.setpointDEG==Pivot.setpoint_vertical){
-                                pivot.setSetpointHorizontal();
+                            if(pivot.setpointDEG==Pivot.setpoint_horizontal){
+                                new SetPivotAngleCommand(pivot, claw,Pivot.setpoint_vertical);
                             }else {
-                                pivot.setSetpointVertical();
+                                new SetPivotAngleCommand(pivot,claw,Pivot.setpoint_horizontal);
                             }
                         }
                         )
@@ -242,16 +242,24 @@ public class TeleOp extends CommandOpMode {
         new GamepadButton(operatorGamepad, GamepadKeys.Button.B)
                 .whileActiveOnce(
                         new SequentialCommandGroup(
-                                new SetPivotAngleCommand(pivot, Pivot.setpoint_horizontal),
-                                new SetExtensionCommand(extension, Extension.intakeMaxExtension),
-                                new SetClawCommand(claw, Claw.intaking)
+                                new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_intaking_start),
+                                new SetExtensionCommand(extension, claw, Extension.intakeMaxExtension),
+                                new SetClawCommand(claw, Claw.ServoPositions.intaking)
+                        )
+                );
+
+        new GamepadButton(operatorGamepad, GamepadKeys.Button.B)
+                .whenReleased(
+                        new SequentialCommandGroup(
+                                new SetClawCommand(claw, 1),
+                                new SetExtensionCommand(extension,  claw, 0)
                         )
                 );
 
         new GamepadButton(operatorGamepad, GamepadKeys.Button.B)
                 .whenReleased(
                     new SequentialCommandGroup(
-                            new SetExtensionCommand(extension, 0)
+                            new SetExtensionCommand(extension, claw, 0)
                     )/*.interruptOn(() -> driverGamepad.getButton(GamepadKeys.Button.B))*/
                 );
 
@@ -262,16 +270,18 @@ public class TeleOp extends CommandOpMode {
                         new ConditionalCommand(
                                 //if intaking
                                 new SequentialCommandGroup(
-                                        new SetPivotAngleCommand(pivot, Pivot.setpoint_intaking),
+                                        new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_intaking),
+                                        new WaitCommand(700),
+                                        new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_horizontal),
                                         new WaitCommand(600),
-                                        new SetPivotAngleCommand(pivot, Pivot.setpoint_horizontal)
+                                        new IntakeStopCommand(intake)
                                 ),
                                 new ConditionalCommand(
                                         //if depositing
                                         new ConditionalCommand(
                                                 //Put Specimen
                                                 new SequentialCommandGroup(
-                                                        new SetExtensionCommand(extension,extension.getSetpointCM()-300),
+                                                        new SetExtensionCommand(extension, claw, extension.getSetpointCM()-300),
                                                         new IntakeOutCommand(intake),
                                                         new WaitCommand(5000),
                                                         new IntakeStopCommand(intake)
@@ -280,10 +290,10 @@ public class TeleOp extends CommandOpMode {
                                                 new SequentialCommandGroup(
                                                         new IntakeOutCommand(intake),
                                                         new WaitCommand(700),
-                                                        new SetClawCommand(claw,Claw.safe),
+                                                        new SetClawCommand(claw,Claw.ServoPositions.safe2),
                                                         new IntakeStopCommand(intake),
                                                         new WaitCommand(200),
-                                                        new SetExtensionCommand(extension,0)
+                                                        new SetExtensionCommand(extension, claw, 0)
                                                 ),
                                                 () -> bot.getMode() == Bot.Modes.SPECIMENS
                                         ),
@@ -302,19 +312,18 @@ public class TeleOp extends CommandOpMode {
                         new ConditionalCommand(
                                 //Specimens
                                 new SequentialCommandGroup(
-                                        new SetClawCommand(claw, Claw.safe),
-                                        new SetPivotAngleCommand(pivot, Pivot.setpoint_vertical),
-                                        new SetExtensionCommand(extension, extension.getBarTarget()),
-                                        new SetClawCommand(claw, Claw.placing)
+                                        new SetClawCommand(claw, Claw.ServoPositions.safe),
+                                        new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_vertical),
+                                        new SetExtensionCommand(extension, claw, extension.getBarTarget()),
+                                        new SetClawCommand(claw, Claw.ServoPositions.placing)
                                 ),
                                 //Samples
                                 new SequentialCommandGroup(
-                                        new SetClawCommand(claw, Claw.safe),
-                                        new SetPivotAngleCommand(pivot, Pivot.setpoint_vertical),
-                                        new SetExtensionCommand(extension, extension.getSamplesTarget()),
-                                        new SetClawCommand(claw, Claw.placing)
-
-
+                                        new SetClawCommand(claw, Claw.ServoPositions.safe),
+                                        new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_vertical),
+                                        new SetExtensionCommand(extension, claw, extension.getSamplesTarget()),
+                                        new WaitCommand(5000),
+                                        new SetClawCommand(claw, Claw.ServoPositions.placing)
                                 ),
                                 () -> bot.getMode() == Bot.Modes.SPECIMENS
                         )
@@ -325,8 +334,8 @@ public class TeleOp extends CommandOpMode {
         new GamepadButton(driverGamepad, GamepadKeys.Button.X)
                 .whenReleased(
                         new SequentialCommandGroup(
-                                new SetClawCommand(claw, Claw.safe),
-                                new SetExtensionCommand(extension, 0)
+                                new SetClawCommand(claw, Claw.ServoPositions.safe),
+                                new SetExtensionCommand(extension, claw, 0)
                         )/*.interruptOn(() -> driverGamepad.getButton(GamepadKeys.Button.X))*/
                 );
 
@@ -369,8 +378,8 @@ public class TeleOp extends CommandOpMode {
         new GamepadButton(operatorGamepad, GamepadKeys.Button.LEFT_STICK_BUTTON).whileActiveOnce(
                 new SequentialCommandGroup(
                         new ParallelCommandGroup(
-                                new SetExtensionCommand(extension,1325),
-                                new SetPivotAngleCommand(pivot,39)
+                                new SetExtensionCommand(extension, claw, 1325),
+                                new SetPivotAngleCommand(pivot,claw,39)
                         ),
                         new WaitUntilCommand(()->operatorGamepad.getButton(GamepadKeys.Button.RIGHT_STICK_BUTTON)),
                         new InstantCommand(()->{
@@ -379,19 +388,19 @@ public class TeleOp extends CommandOpMode {
                         new InstantCommand(()->{
                             // pivot.multiplyP();
                         }),
-                        new SetPivotAngleCommand(pivot,44),
+                        new SetPivotAngleCommand(pivot,claw, Pivot.setpoint_climb),
                         new ParallelCommandGroup(
                                 new InstantCommand(()->{
                                     //extension.multiplyP();
                                 }),
                                 new SequentialCommandGroup(
-                                        new SetExtensionCommand(extension,-5),
+                                        new SetExtensionCommand(extension, claw, -5),
                                         new InstantCommand(()->{
                                             //extension.multiplyP();
                                         })
                                 ),
 
-                                new SetPivotAngleCommand(pivot,110)
+                                new SetPivotAngleCommand(pivot,claw,110)
                         )
 
                 )
@@ -401,8 +410,8 @@ public class TeleOp extends CommandOpMode {
                 new ConditionalCommand(
                         new WaitCommand(0),
                         new ParallelCommandGroup(
-                                new SetExtensionCommand(extension,1),
-                                new SetPivotAngleCommand(pivot,1)
+                                new SetExtensionCommand(extension, claw, 1),
+                                new SetPivotAngleCommand(pivot,claw,1)
                         ),
                         () -> bot.climbing
                 )
@@ -411,17 +420,17 @@ public class TeleOp extends CommandOpMode {
         //endregion
 
         //region Test
-        new GamepadButton(operatorGamepad, GamepadKeys.Button.LEFT_BUMPER).whileHeld(
-                new InstantCommand(()->{intake.in();})
-        ).whenReleased(
-                new InstantCommand(()->{intake.stop();})
-        );
+        //new GamepadButton(operatorGamepad, GamepadKeys.Button.LEFT_BUMPER).whileHeld(
+        //        new InstantCommand(()->{intake.in();})
+        //).whenReleased(
+        //        new InstantCommand(()->{intake.stop();})
+        //);
 
-        new GamepadButton(operatorGamepad, GamepadKeys.Button.RIGHT_BUMPER).whileHeld(
-                new InstantCommand(()->{intake.out();})
-        ).whenReleased(
-                new InstantCommand(()->{intake.stop();})
-        );
+        //new GamepadButton(operatorGamepad, GamepadKeys.Button.RIGHT_BUMPER).whileHeld(
+        //        new InstantCommand(()->{intake.out();})
+        //).whenReleased(
+        //        new InstantCommand(()->{intake.stop();})
+        //);
         //endregion
 
         //region Automation
@@ -430,8 +439,8 @@ public class TeleOp extends CommandOpMode {
         schedule(
                 new ParallelCommandGroup(
                         new SetBotStateCommand(bot, BotState.INTAKE),
-                        new SetExtensionCommand(bot.getExtension(), 0),
-                        new SetPivotAngleCommand(bot.getPivot(), 90)
+                        new SetExtensionCommand(bot.getExtension(), claw,  0),
+                        new SetPivotAngleCommand(bot.getPivot(), claw, Pivot.setpoint_horizontal)
                 )
         );
 

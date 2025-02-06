@@ -1,8 +1,13 @@
 package org.firstinspires.ftc.teamcode.common.commandbase.command.pivot;
 
 import com.arcrobotics.ftclib.command.CommandBase;
+import com.arcrobotics.ftclib.command.ConditionalCommand;
+import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.arcrobotics.ftclib.command.WaitCommand;
 
 import org.firstinspires.ftc.teamcode.common.Config;
+import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Claw;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Pivot;
 
 public class SetPivotAngleCommand extends CommandBase {
@@ -11,24 +16,46 @@ public class SetPivotAngleCommand extends CommandBase {
     private final double angleDeg;
     private final boolean ignoreSafety;
 
-    public SetPivotAngleCommand(Pivot pivot, double angleDeg) {
-        this(pivot, angleDeg, false);
+    private final Claw claw;
+
+    public SetPivotAngleCommand(Pivot pivot, Claw claw, double angleDeg) {
+        this(pivot, claw, angleDeg, false);
     }
 
-    public SetPivotAngleCommand(Pivot pivot, double angleDeg, boolean ignoreSafety) {
+    public SetPivotAngleCommand(Pivot pivot, Claw claw, double angleDeg, boolean ignoreSafety) {
         this.pivot = pivot;
         this.angleDeg = angleDeg;
         this.ignoreSafety = ignoreSafety;
+        this.claw = claw;
         addRequirements(pivot);
     }
 
     @Override
     public void initialize() {
-        if (ignoreSafety) {
-            pivot.setSetpointIGNORE(angleDeg);
-            return;
-        }
-        pivot.setSetpointDEG(angleDeg);
+        new ConditionalCommand(
+                new SequentialCommandGroup(
+                        new InstantCommand(()->{
+                            claw.setPosition(1);
+                        }),
+                        new WaitCommand(500),
+                        new InstantCommand(()->{
+                            if (ignoreSafety) {
+                                pivot.setSetpointIGNORE(angleDeg);
+                            }else{
+                                pivot.setSetpointDEG(angleDeg);
+                            }
+                        })
+                ),
+                new InstantCommand(()->{
+                    if (ignoreSafety) {
+                        pivot.setSetpointIGNORE(angleDeg);
+                    }else {
+                        pivot.setSetpointDEG(angleDeg);
+                    }
+                }),
+                ()->claw.clawPivot.getPosition()!=1
+        ).schedule();
+
     }
 
     @Override
