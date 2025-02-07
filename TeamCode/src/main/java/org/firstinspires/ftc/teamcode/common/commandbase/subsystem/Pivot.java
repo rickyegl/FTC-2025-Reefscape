@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.common.commandbase.subsystem;
 
+import static org.firstinspires.ftc.teamcode.common.Config.pivot_h_kF;
 import static org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Extension.depositMaxExtension;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
@@ -21,10 +22,10 @@ public class Pivot extends SubsystemBase {
     public final DcMotor pivotMotorL;
     public final DcMotor pivotMotorR;
 
-    public static final double setpoint_intaking = 85, setpoint_vertical = 0, setpoint_horizontal = 85, setpoint_intaking_start = 80, setpoint_climb = 44;
+    public static final double setpoint_intaking = 85, setpoint_vertical = 0, setpoint_horizontal = 80, setpoint_intaking_start = 80, setpoint_climb = 44;
 
     private final PIDFController pivotController;
-    public double setpointDEG = 0.0, minAngle = 0.0, maxAngle = 107;
+    public double setpointDEG = Pivot.setpoint_horizontal, minAngle = 0.0, maxAngle = 107;
     private final double encoderOffset = -108.0;
 
     public Pivot(Bot bot) {
@@ -53,26 +54,34 @@ public class Pivot extends SubsystemBase {
 
     @Override
     public void periodic() {
-        double kFConstant = (Config.pivot_maxH_kF - Config.pivot_h_kF) / depositMaxExtension;
+        double kFConstant = (Config.pivot_maxH_kF - pivot_h_kF) / depositMaxExtension;
         double extensionFF = (kFConstant * (bot.getExtension().getPositionCM()));
         double pivotFF  = (Math.cos(pivotMotorL.getCurrentPosition() - Math.toRadians(60)));
-        double calculatedKf = ((extensionFF + Config.pivot_h_kF) * pivotFF);
+        double calculatedKf = ((extensionFF + pivot_h_kF) * pivotFF);
         pivotController.setF(calculatedKf);
 
         double power = pivotController.calculate(
                 getPositionDEG(),
                 setpointDEG
         );
+
+        if(bot.getExtension().getSetpointCM()>1500&&getSetpointDEG()>70){
+            pivotController.setF(pivot_h_kF);
+        }else {
+            pivotController.setF(0);
+        }
+
         pivotMotorR.setPower(-power);
         pivotMotorL.setPower(power);
 
 
+
+        bot.telem.addData("Pivot InTolerance", inTolerance());
         bot.telem.addData("Pivot Angle", getPositionDEG());
+        bot.telem.addData("Pivot Setpoint", setpointDEG);
+        bot.telem.addData("Pivot F", kFConstant);
         bot.telem.addData("Pivot LPosition", pivotMotorL.getCurrentPosition());
         bot.telem.addData("Pivot RPosition", pivotMotorR.getCurrentPosition());
-
-        bot.telem.addData("Pivot Target", setpointDEG);
-        bot.telem.addData("Bot State", bot.getState());
         bot.telem.update();
     }
 
@@ -131,5 +140,9 @@ public class Pivot extends SubsystemBase {
 
     public void multiplyP(){
         pivotController.setP(pivotController.getP()*4);
+    }
+
+    public boolean inTolerance(){
+        return (Math.abs(Math.abs(getPositionDEG()) - Math.abs(getPositionDEG()))) <= Config.pivot_tolerance;
     }
 }

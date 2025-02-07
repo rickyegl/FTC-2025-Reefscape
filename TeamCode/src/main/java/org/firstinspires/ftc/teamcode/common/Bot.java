@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.BotState;
-import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Claw;
+import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.ClawPID;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Extension;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Intake;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.MecanumDrivetrain;
@@ -27,7 +27,7 @@ public class Bot extends Robot {
 
     private final Intake intake;
 
-    private final Claw claw;
+    private final ClawPID claw;
 
     private MecanumDrivetrain drivetrain;
 
@@ -72,7 +72,7 @@ public class Bot extends Robot {
         pivot = new Pivot(this);
         extension = new Extension(this);
         intake = new Intake(this);
-        claw = new Claw(this);
+        claw = new ClawPID(this);
     }
 
     /**
@@ -97,7 +97,7 @@ public class Bot extends Robot {
     public Pivot getPivot() { return pivot; }
     public Extension getExtension() { return extension; }
     public Intake getIntake() { return intake; }
-    public Claw getClaw() { return claw; }
+    public ClawPID getClaw() { return claw; }
     public BotState getState() { return state; }
 
     public void setState(BotState state) { this.state = state; }

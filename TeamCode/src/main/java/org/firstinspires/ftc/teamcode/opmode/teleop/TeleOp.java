@@ -14,23 +14,17 @@ import com.arcrobotics.ftclib.command.button.Button;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
-import com.arcrobotics.ftclib.geometry.Vector2d;
-import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
-import com.qualcomm.robotcore.hardware.Gamepad;
 
-import org.firstinspires.ftc.teamcode.BotState;
 import org.firstinspires.ftc.teamcode.common.Bot;
-import org.firstinspires.ftc.teamcode.common.commandbase.command.claw.SetClawCommand;
+import org.firstinspires.ftc.teamcode.common.commandbase.command.claw.SetClawPIDCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.drive.TeleOpDriveCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.extension.ManualExtensionCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.extension.SetExtensionCommand;
-import org.firstinspires.ftc.teamcode.common.commandbase.command.intake.IntakeInCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.intake.IntakeOutCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.intake.IntakeStopCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.pivot.ManualPivotCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.pivot.SetPivotAngleCommand;
-import org.firstinspires.ftc.teamcode.common.commandbase.command.state.SetBotStateCommand;
-import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Claw;
+import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.ClawPID;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Extension;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Intake;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.MecanumDrivetrain;
@@ -44,7 +38,7 @@ public class TeleOp extends CommandOpMode {
     private Pivot pivot;
     private Extension extension;
     private Intake intake;
-    private Claw claw;
+    private ClawPID claw;
     private MecanumDrivetrain drivetrain;
     private boolean enableDrive = true;
 
@@ -244,15 +238,15 @@ public class TeleOp extends CommandOpMode {
                         new SequentialCommandGroup(
                                 new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_intaking_start),
                                 new SetExtensionCommand(extension, claw, Extension.intakeMaxExtension),
-                                new SetClawCommand(claw, Claw.ServoPositions.intaking)
+                                new SetClawPIDCommand(claw, ClawPID.ServoPositions.intaking)
                         )
                 );
 
         new GamepadButton(operatorGamepad, GamepadKeys.Button.B)
                 .whenReleased(
                         new SequentialCommandGroup(
-                                new SetClawCommand(claw, 1),
-                                new SetExtensionCommand(extension,  claw, 0)
+                                new SetExtensionCommand(extension,  claw, 0),
+                                new SetClawPIDCommand(claw, ClawPID.ServoPositions.intaking)
                         )
                 );
 
@@ -271,10 +265,11 @@ public class TeleOp extends CommandOpMode {
                                 //if intaking
                                 new SequentialCommandGroup(
                                         new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_intaking),
+                                        new SetClawPIDCommand(claw, ClawPID.ServoPositions.intaking),
                                         new WaitCommand(700),
                                         new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_horizontal),
                                         new WaitCommand(600),
-                                        new IntakeStopCommand(intake)
+                                        new SetClawPIDCommand(claw,ClawPID.ServoPositions.safeE)
                                 ),
                                 new ConditionalCommand(
                                         //if depositing
@@ -289,11 +284,8 @@ public class TeleOp extends CommandOpMode {
                                                 //Put Sample
                                                 new SequentialCommandGroup(
                                                         new IntakeOutCommand(intake),
-                                                        new WaitCommand(700),
-                                                        new SetClawCommand(claw,Claw.ServoPositions.safe2),
-                                                        new IntakeStopCommand(intake),
-                                                        new WaitCommand(200),
-                                                        new SetExtensionCommand(extension, claw, 0)
+                                                        new WaitUntilCommand(()->!operatorGamepad.getButton(GamepadKeys.Button.Y)),
+                                                        new IntakeStopCommand(intake)
                                                 ),
                                                 () -> bot.getMode() == Bot.Modes.SPECIMENS
                                         ),
@@ -312,18 +304,15 @@ public class TeleOp extends CommandOpMode {
                         new ConditionalCommand(
                                 //Specimens
                                 new SequentialCommandGroup(
-                                        new SetClawCommand(claw, Claw.ServoPositions.safe),
                                         new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_vertical),
                                         new SetExtensionCommand(extension, claw, extension.getBarTarget()),
-                                        new SetClawCommand(claw, Claw.ServoPositions.placing)
+                                        new SetClawPIDCommand(claw, ClawPID.ServoPositions.placing)
                                 ),
                                 //Samples
                                 new SequentialCommandGroup(
-                                        new SetClawCommand(claw, Claw.ServoPositions.safe),
                                         new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_vertical),
                                         new SetExtensionCommand(extension, claw, extension.getSamplesTarget()),
-                                        new WaitCommand(5000),
-                                        new SetClawCommand(claw, Claw.ServoPositions.placing)
+                                        new SetClawPIDCommand(claw, ClawPID.ServoPositions.placing)
                                 ),
                                 () -> bot.getMode() == Bot.Modes.SPECIMENS
                         )
@@ -334,7 +323,6 @@ public class TeleOp extends CommandOpMode {
         new GamepadButton(driverGamepad, GamepadKeys.Button.X)
                 .whenReleased(
                         new SequentialCommandGroup(
-                                new SetClawCommand(claw, Claw.ServoPositions.safe),
                                 new SetExtensionCommand(extension, claw, 0)
                         )/*.interruptOn(() -> driverGamepad.getButton(GamepadKeys.Button.X))*/
                 );
@@ -438,19 +426,22 @@ public class TeleOp extends CommandOpMode {
 
         schedule(
                 new ParallelCommandGroup(
-                        new SetBotStateCommand(bot, BotState.INTAKE),
-                        new SetExtensionCommand(bot.getExtension(), claw,  0),
-                        new SetPivotAngleCommand(bot.getPivot(), claw, Pivot.setpoint_horizontal)
+                        //new SetBotStateCommand(bot, BotState.INTAKE),
+                        //new SetExtensionCommand(bot.getExtension(), claw,  0),
+                        //new SetPivotAngleCommand(bot.getPivot(), claw, Pivot.setpoint_horizontal),
+                        new SetClawPIDCommand(claw,30)
                 )
         );
 
         while (opModeInInit()){
-            bot.telem.addData("Pivot Angle", pivot.getPositionDEG());
+            //bot.telem.addData("Pivot Angle", pivot.getPositionDEG());
             //bot.telem.addData("Pivot AngleT", pivot.getPositionT());
             //bot.telem.addData("Pivot LPosition", pivot.pivotMotorL.getCurrentPosition());
             //bot.telem.addData("Pivot RPosition", pivot.pivotMotorR.getCurrentPosition());
             bot.telem.addData("ViperL", extension.bottomExtensionMotor.getCurrentPosition());
             bot.telem.addData("ViperR", extension.topExtensionMotor.getCurrentPosition());
+            bot.telem.addData("Claw Setpoint",claw.currentPosition);
+            bot.telem.addData("Claw Position",claw.getPositionDeg());
             bot.telem.update();
         }
 

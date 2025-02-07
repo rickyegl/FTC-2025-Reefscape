@@ -18,7 +18,11 @@ public class Claw extends SubsystemBase {
 
     @com.acmerobotics.dashboard.config.Config
     public static class ServoPositions {
-        public static double placing = 0.6, safe = 0.3, intaking = 0.15, safe2= 0.15;
+        public static double
+                placing = 0.6,
+                safe = 0.3,
+                intaking = 0.15,
+                safe2= 0.15;
     }
 
 
@@ -36,11 +40,6 @@ public class Claw extends SubsystemBase {
         currentPosition = position;
     }
 
-    public boolean inTolerance(){
-        if(Math.abs(clawPivot.getPosition() - currentPosition) < treshold){
-            return true;
-        }
-        return false;
-    }
+
 
 }

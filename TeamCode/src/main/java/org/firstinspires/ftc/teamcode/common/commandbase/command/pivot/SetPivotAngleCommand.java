@@ -7,7 +7,8 @@ import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 
 import org.firstinspires.ftc.teamcode.common.Config;
-import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Claw;
+import org.firstinspires.ftc.teamcode.common.commandbase.command.claw.SetClawPIDCommand;
+import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.ClawPID;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Pivot;
 
 public class SetPivotAngleCommand extends CommandBase {
@@ -16,13 +17,13 @@ public class SetPivotAngleCommand extends CommandBase {
     private final double angleDeg;
     private final boolean ignoreSafety;
 
-    private final Claw claw;
+    private final ClawPID claw;
 
-    public SetPivotAngleCommand(Pivot pivot, Claw claw, double angleDeg) {
+    public SetPivotAngleCommand(Pivot pivot, ClawPID claw, double angleDeg) {
         this(pivot, claw, angleDeg, false);
     }
 
-    public SetPivotAngleCommand(Pivot pivot, Claw claw, double angleDeg, boolean ignoreSafety) {
+    public SetPivotAngleCommand(Pivot pivot, ClawPID claw, double angleDeg, boolean ignoreSafety) {
         this.pivot = pivot;
         this.angleDeg = angleDeg;
         this.ignoreSafety = ignoreSafety;
@@ -32,34 +33,25 @@ public class SetPivotAngleCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        new ConditionalCommand(
-                new SequentialCommandGroup(
-                        new InstantCommand(()->{
-                            claw.setPosition(1);
-                        }),
-                        new WaitCommand(500),
-                        new InstantCommand(()->{
-                            if (ignoreSafety) {
-                                pivot.setSetpointIGNORE(angleDeg);
-                            }else{
-                                pivot.setSetpointDEG(angleDeg);
-                            }
-                        })
+        new SequentialCommandGroup(
+                new ConditionalCommand(
+                        new SetClawPIDCommand(claw, ClawPID.ServoPositions.safeP),
+                        new WaitCommand(0),
+                        ()->Math.abs(pivot.getPositionDEG())-Math.abs(angleDeg)>30
                 ),
                 new InstantCommand(()->{
                     if (ignoreSafety) {
                         pivot.setSetpointIGNORE(angleDeg);
-                    }else {
+                    }else{
                         pivot.setSetpointDEG(angleDeg);
                     }
-                }),
-                ()->claw.clawPivot.getPosition()!=1
+                })
         ).schedule();
 
     }
 
     @Override
     public boolean isFinished() {
-        return (Math.abs(pivot.getPositionDEG() - angleDeg) <= Config.pivot_tolerance);
+        return pivot.inTolerance();
     }
 }

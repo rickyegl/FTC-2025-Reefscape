@@ -17,7 +17,7 @@ public class Extension extends SubsystemBase {
 
     private final PIDFController extensionController;
     public static double setpointCM = 0.0, highBarTarget = 2500.0, lowBarTarget = 17.0, lowBasketTarget = 20.0, highBasketTarget = 3250, ticksperCM = 1;//10.37339803;
-    public static double minExtension = 0.0, depositMaxExtension = 30, intakeMaxExtension = 1500;
+    public static double minExtension = 0.0, depositMaxExtension = 30, intakeMaxExtension = 1700;
     public double getBarTarget() {
         if (bot.getLevel() == Bot.Levels.Up) {
             return highBarTarget;
@@ -71,6 +71,7 @@ public class Extension extends SubsystemBase {
         topExtensionMotor.setPower(power);
         bottomExtensionMotor.setPower(power);
 
+        bot.telem.addData("Extension InTolerance", inTolerance());
         bot.telem.addData("Extension Position", getPositionCM());
         bot.telem.addData("Extension Target", getSetpointCM());
         bot.telem.addData("Calculated Extension kF", extensionController.getF());
@@ -121,6 +122,10 @@ public class Extension extends SubsystemBase {
     }
     public void resetP(){
         extensionController.setP(Config.extension_kP);
+    }
+
+    public boolean inTolerance(){
+        return (Math.abs(getPositionCM()) - setpointCM) <= Config.extension_tolerance;
     }
 
 }
