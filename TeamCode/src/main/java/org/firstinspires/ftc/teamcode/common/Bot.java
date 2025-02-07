@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.common;
 
 import com.arcrobotics.ftclib.command.Robot;
+import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.geometry.Pose2d;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -19,7 +20,9 @@ public class Bot extends Robot {
     private final IMU imu;
     public final Telemetry telem;
     public final HardwareMap hMap;
-    public final Gamepad gamepad;
+    public final Gamepad driver;
+
+    public final Gamepad opertator;
 
     public BotState state = BotState.DEPOSIT;
     private final Pivot pivot;
@@ -48,10 +51,11 @@ public class Bot extends Robot {
         Down
     }
 
-    public Bot(Telemetry telem, HardwareMap hMap, Gamepad gamepad, boolean enableDrive) {
+    public Bot(Telemetry telem, HardwareMap hMap, GamepadEx gamepad, GamepadEx gamepad2, boolean enableDrive) {
         this.telem = telem;
         this.hMap = hMap;
-        this.gamepad = gamepad;
+        this.driver = gamepad;
+        this.opertator = gamepad2;
 
         // TODO: Adjust IMU parameters to match hub orientation
         imu = hMap.get(IMU.class, "imu");
