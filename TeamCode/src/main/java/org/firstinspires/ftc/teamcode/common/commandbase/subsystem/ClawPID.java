@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.common.commandbase.subsystem;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.controller.PIDFController;
+import com.arcrobotics.ftclib.util.MathUtils;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -20,7 +21,7 @@ public class ClawPID extends SubsystemBase {
     private double angleOffset = 0;
     @com.acmerobotics.dashboard.config.Config
     public static class ServoPositions {
-        public static double placing = 75.83984375, safeP = 0, safeE = 27, intaking = 270;
+        public static double placing = 80, safeP = 0, safeE = 27, intaking = 290, sampling = 75.83984375, specimening = 140,preintaking = 143;
     }
     public ClawPID(Bot bot) {
         this.bot = bot;
@@ -35,9 +36,11 @@ public class ClawPID extends SubsystemBase {
             pd.setF(-0.003);
         }else{
             //start pose
-            pd.setF(0.003);
+            //pd.setF(0.003);
         }
-        clawPivot.setPower(pd.calculate(getPositionDeg(),currentPosition));
+        double clawPower = pd.calculate(getPositionDeg(),currentPosition);
+        clawPower = MathUtils.clamp(clawPower,-0.8,0.8);
+        clawPivot.setPower(clawPower);
         bot.telem.addData("Claw InTolerance",inTolerance());
         bot.telem.addData("Claw Setpoint",currentPosition);
         bot.telem.addData("Claw Position",getPositionDeg());

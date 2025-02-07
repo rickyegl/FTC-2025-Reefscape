@@ -1,13 +1,16 @@
 package org.firstinspires.ftc.teamcode.common.commandbase.command.extension;
 
 import com.arcrobotics.ftclib.command.CommandBase;
+import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.arcrobotics.ftclib.command.WaitCommand;
 
 import org.firstinspires.ftc.teamcode.common.Config;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.claw.SetClawPIDCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.ClawPID;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Extension;
+import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Intake;
 
 /**
  * SetExtensionCommand is a command that sets the extension to a specific setpoint
@@ -19,10 +22,14 @@ public class SetExtensionCommand extends CommandBase {
     private final double setpoint;
     private final ClawPID claw;
 
-    public SetExtensionCommand(Extension e, ClawPID claw, double setpointcm) {
+    private final Intake intake;
+
+
+    public SetExtensionCommand(Extension e, ClawPID claw, Intake intake, double setpointcm) {
         extension = e;
         this.setpoint = setpointcm;
         this.claw = claw;
+        this.intake = intake;
         extension.setSetpointCM(setpoint);
         addRequirements(extension);
     }
@@ -30,7 +37,12 @@ public class SetExtensionCommand extends CommandBase {
     @Override
     public void initialize() {
         new SequentialCommandGroup(
-                new SetClawPIDCommand(claw, ClawPID.ServoPositions.safeE),
+                //new ConditionalCommand(
+                //        new SetClawPIDCommand(claw, ClawPID.ServoPositions.safeE),
+                //        new WaitCommand(0),
+                //        ()->intake.speed!=0
+                //),
+
                 new InstantCommand(()->{
                     extension.setSetpointCM(setpoint);
                 })

@@ -26,7 +26,8 @@ public class Pivot extends SubsystemBase {
 
     public static final double setpoint_intaking = 90, setpoint_vertical = 0, setpoint_horizontal = 87, setpoint_intaking_start = 80, setpoint_climb = 44;
 
-    private final PIDFController pivotController;
+    public final PIDFController pivotController;
+    public boolean overrideF = false;
     public double setpointDEG = Pivot.setpoint_horizontal, minAngle = 0.0, maxAngle = 107;
     private final double encoderOffset = -108.0;
 
@@ -67,19 +68,22 @@ public class Pivot extends SubsystemBase {
                 setpointDEG
         );
 
-        if(bot.getExtension().getPositionCM()>1500&&getSetpointDEG()>70){
-            pivotController.setF(pivot_h_kF);
-            pivotController.setP(pivot_kP*2.5);
-        }else if(getSetpointDEG()>70){
-            pivotController.setF(pivot_hN_kF);
-            pivotController.setP(pivot_kP);
-        }
-        else {
-            pivotController.setF(0);
+        if(!overrideF){
+            if(bot.getExtension().getPositionCM()>1500&&getSetpointDEG()>80){
+                pivotController.setF(pivot_h_kF);
+                pivotController.setP(pivot_kP);
+            }else if(getSetpointDEG()>70){
+                pivotController.setF(pivot_hN_kF);
+                pivotController.setP(pivot_kP);
+            }
+            else {
+                pivotController.setF(0);
+            }
         }
 
-        pivotMotorR.setPower(power);
-        pivotMotorL.setPower(-power);
+
+        pivotMotorR.setPower(-power);
+        pivotMotorL.setPower(power);
 
 
         bot.telem.addData("Pivot InTolerance", inTolerance());
@@ -150,6 +154,6 @@ public class Pivot extends SubsystemBase {
     }
 
     public boolean inTolerance(){
-        return (Math.abs(Math.abs(getPositionDEG()) - Math.abs(getSetpointDEG()))) <= Config.pivot_tolerance;
+        return Math.abs(getPositionDEG() - getSetpointDEG()) <= Config.pivot_tolerance;
     }
 }

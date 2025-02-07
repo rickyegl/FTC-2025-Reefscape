@@ -16,8 +16,8 @@ public class Extension extends SubsystemBase {
     public final DcMotor bottomExtensionMotor, topExtensionMotor;
 
     private final PIDFController extensionController;
-    public static double setpointCM = 0.0, highBarTarget = 2500.0, lowBarTarget = 17.0, lowBasketTarget = 20.0, highBasketTarget = 3250, ticksperCM = 1;//10.37339803;
-    public static double minExtension = 0.0, depositMaxExtension = 30, intakeMaxExtension = 2200;
+    public static double setpointCM = 0.0, highBarTarget = 1070, lowBarTarget = 17.0, lowBasketTarget = 1500.0, highBasketTarget = 3250, ticksperCM = 1;//10.37339803;
+    public static double minExtension = 0.0, depositMaxExtension = 30, intakeMaxExtension = 1800, specimening = 550;
     public double getBarTarget() {
         if (bot.getLevel() == Bot.Levels.Up) {
             return highBarTarget;
