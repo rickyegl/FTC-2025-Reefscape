@@ -197,20 +197,23 @@ public class TeleOp extends CommandOpMode {
                         new ConditionalCommand(
                                 //if intaking
                                 new SequentialCommandGroup(
-                                        new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_intaking),
                                         new SetClawPIDCommand(claw, ClawPID.ServoPositions.intaking),
                                         new IntakeInCommand(intake),
-                                        new InstantCommand(()->{
-                                            pivot.pivotController.setF(0);
-                                            pivot.overrideF = true;
-                                        }),
+                                        new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_intaking),
+
+                                        //new InstantCommand(()->{
+                                        //    pivot.pivotController.setF(0);
+                                        //    pivot.overrideF = true;
+                                        //}),
                                         new WaitUntilCommand(()->!operatorGamepad.getButton(GamepadKeys.Button.Y)),
-                                        new InstantCommand(()->{
-                                            pivot.overrideF = false;
-                                        }),
-                                        new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_horizontal),
+                                        ///new SetClawPIDCommand(claw, ClawPID.ServoPositions.preintaking),
+                                        //new InstantCommand(()->{
+                                        //    pivot.overrideF = false;
+                                        //}),
+                                        //new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_horizontal),
                                         new IntakeCustomCommand(intake,0.2),
-                                        new SetClawPIDCommand(claw,ClawPID.ServoPositions.safeE)
+                                        new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_horizontal)
+                                        //new SetClawPIDCommand(claw,ClawPID.ServoPositions.safeE)
                                 ),
                                 new ConditionalCommand(
                                         //if depositing
@@ -222,16 +225,6 @@ public class TeleOp extends CommandOpMode {
                                                         new WaitCommand(600),
                                                         new IntakeOutCommand(intake),
                                                         new WaitUntilCommand(()->!operatorGamepad.getButton(GamepadKeys.Button.Y)),
-
-                                                        new InstantCommand(()->{
-                                                            //pivot.pivotController.setF(pivot.pivotController.getF()*10);
-                                                            //pivot.overrideF = true;
-                                                        }),
-                                                        new WaitCommand(600),
-                                                        new InstantCommand(()->{
-                                                            //pivot.overrideF = false;
-                                                        }),
-
                                                         new IntakeStopCommand(intake)
                                                         //v2
 
@@ -404,7 +397,7 @@ public class TeleOp extends CommandOpMode {
         );
 
         while (opModeInInit()){
-            //bot.telem.addData("Pivot Angle", pivot.getPositionDEG());
+            bot.telem.addData("Pivot Angle", pivot.getPositionDEG());
             //bot.telem.addData("Pivot AngleT", pivot.getPositionT());
             //bot.telem.addData("Pivot LPosition", pivot.pivotMotorL.getCurrentPosition());
             //bot.telem.addData("Pivot RPosition", pivot.pivotMotorR.getCurrentPosition());

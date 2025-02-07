@@ -24,7 +24,7 @@ public class Pivot extends SubsystemBase {
     public final DcMotor pivotMotorL;
     public final DcMotor pivotMotorR;
 
-    public static final double setpoint_intaking = 90, setpoint_vertical = 0, setpoint_horizontal = 87, setpoint_intaking_start = 80, setpoint_climb = 44;
+    public static final double setpoint_intaking = 89, setpoint_vertical = 0, setpoint_horizontal = 87, setpoint_intaking_start = 80, setpoint_climb = 44;
 
     public final PIDFController pivotController;
     public boolean overrideF = false;
@@ -53,6 +53,8 @@ public class Pivot extends SubsystemBase {
                 Config.pivot_kD,
                 Config.pivot_n_kF
         );
+
+        pivotMotorL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     @Override
@@ -68,13 +70,14 @@ public class Pivot extends SubsystemBase {
                 setpointDEG
         );
 
+
         if(!overrideF){
-            if(bot.getExtension().getPositionCM()>1500&&getSetpointDEG()>80){
+            if(bot.getExtension().getPositionCM()>1300&&getSetpointDEG()>80){
                 pivotController.setF(pivot_h_kF);
-                pivotController.setP(pivot_kP);
+                //pivotController.setP(pivot_kP);
             }else if(getSetpointDEG()>70){
                 pivotController.setF(pivot_hN_kF);
-                pivotController.setP(pivot_kP);
+                //pivotController.setP(pivot_kP);
             }
             else {
                 pivotController.setF(0);
@@ -82,8 +85,10 @@ public class Pivot extends SubsystemBase {
         }
 
 
+
+
         pivotMotorR.setPower(-power);
-        pivotMotorL.setPower(power);
+        //pivotMotorL.setPower(power);
 
 
         bot.telem.addData("Pivot InTolerance", inTolerance());

@@ -42,7 +42,11 @@ public class SetExtensionCommand extends CommandBase {
                 //        new WaitCommand(0),
                 //        ()->intake.speed!=0
                 //),
-
+                new ConditionalCommand(
+                        new SetClawPIDCommand(claw,ClawPID.ServoPositions.safechambering),
+                        new SetClawPIDCommand(claw, ClawPID.ServoPositions.safeE),
+                        ()->extension.getSetpointCM()==extension.getSamplesTarget()
+                        ),
                 new InstantCommand(()->{
                     extension.setSetpointCM(setpoint);
                 })
