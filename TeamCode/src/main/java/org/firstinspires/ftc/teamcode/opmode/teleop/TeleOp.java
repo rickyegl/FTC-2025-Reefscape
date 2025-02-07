@@ -63,8 +63,8 @@ public class TeleOp extends CommandOpMode {
         telem = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         driverGamepad = new GamepadEx(gamepad1);
-        operatorGamepad = driverGamepad;
-        //operatorGamepad = new GamepadEx(gamepad2);
+        //operatorGamepad = driverGamepad;
+        operatorGamepad = new GamepadEx(gamepad2);
 
         //gamepad1.setLedColor(255, 255, 0, Gamepad.LED_DURATION_CONTINUOUS);
 
