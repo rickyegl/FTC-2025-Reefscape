@@ -34,6 +34,10 @@ public class Intake extends SubsystemBase {
         roller2.setPower(speed);
     }
 
+    public void setSpeed(double speed){
+        this.speed = speed;
+    }
+
     public void in(){
         speed = 1;
     }

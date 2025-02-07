@@ -20,7 +20,7 @@ public class ClawPID extends SubsystemBase {
     private double angleOffset = 0;
     @com.acmerobotics.dashboard.config.Config
     public static class ServoPositions {
-        public static double placing = 70.83984375, safeP = 0, safeE = 27, intaking = 255;
+        public static double placing = 75.83984375, safeP = 0, safeE = 27, intaking = 270;
     }
     public ClawPID(Bot bot) {
         this.bot = bot;

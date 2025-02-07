@@ -20,6 +20,8 @@ import org.firstinspires.ftc.teamcode.common.commandbase.command.claw.SetClawPID
 import org.firstinspires.ftc.teamcode.common.commandbase.command.drive.TeleOpDriveCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.extension.ManualExtensionCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.extension.SetExtensionCommand;
+import org.firstinspires.ftc.teamcode.common.commandbase.command.intake.IntakeCustomCommand;
+import org.firstinspires.ftc.teamcode.common.commandbase.command.intake.IntakeInCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.intake.IntakeOutCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.intake.IntakeStopCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.pivot.ManualPivotCommand;
@@ -57,8 +59,8 @@ public class TeleOp extends CommandOpMode {
         telem = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         driverGamepad = new GamepadEx(gamepad1);
-        operatorGamepad = driverGamepad;
-        //operatorGamepad = new GamepadEx(gamepad2);
+        //operatorGamepad = driverGamepad;
+        operatorGamepad = new GamepadEx(gamepad2);
 
         //gamepad1.setLedColor(255, 255, 0, Gamepad.LED_DURATION_CONTINUOUS);
 
@@ -94,88 +96,6 @@ public class TeleOp extends CommandOpMode {
         //region HLock
         double basketAngle = 180+45;
         double transformangle = -45;
-
-        new GamepadButton(driverGamepad, GamepadKeys.Button.DPAD_UP)
-                .whileHeld(
-                        new InstantCommand(()->{
-                            drivetrain.setTargetHeadingDEG(0);
-                            drivetrain.setHeadingLock(true);
-                        })
-                );
-
-        new GamepadButton(driverGamepad, GamepadKeys.Button.DPAD_RIGHT)
-                .whileHeld(
-                        new InstantCommand(()->{
-                            drivetrain.setTargetHeadingDEG(transformangle);
-                            drivetrain.setHeadingLock(true);
-                        })
-                );
-
-        new GamepadButton(driverGamepad, GamepadKeys.Button.DPAD_DOWN)
-                .whileHeld(
-                        new InstantCommand(()->{
-                            drivetrain.setTargetHeadingDEG(180);
-                            drivetrain.setHeadingLock(true);
-                        })
-                );
-
-        new GamepadButton(driverGamepad, GamepadKeys.Button.DPAD_LEFT)
-                .whileHeld(
-                        new InstantCommand(()->{
-                            drivetrain.setTargetHeadingDEG(basketAngle);
-                            drivetrain.setHeadingLock(true);
-                        })
-                );
-
-        if(driverGamepad != operatorGamepad){
-            new GamepadButton(driverGamepad, GamepadKeys.Button.Y)
-                    .whileHeld(
-                            new InstantCommand(()->{
-                                drivetrain.setTargetHeadingDEG(0);
-                                drivetrain.setHeadingLock(true);
-                            })
-                    ).whenReleased(
-                            new  InstantCommand(()->{
-                                drivetrain.setHeadingLock(false);
-                            })
-                    );
-
-            new GamepadButton(driverGamepad, GamepadKeys.Button.B)
-                    .whileHeld(
-                            new InstantCommand(()->{
-                                drivetrain.setTargetHeadingDEG(transformangle);
-                                drivetrain.setHeadingLock(true);
-                            })
-                    ).whenReleased(
-                            new  InstantCommand(()->{
-                                drivetrain.setHeadingLock(false);
-                            })
-                    );
-
-            new GamepadButton(driverGamepad, GamepadKeys.Button.A)
-                    .whileHeld(
-                            new InstantCommand(()->{
-                                drivetrain.setTargetHeadingDEG(180);
-                                drivetrain.setHeadingLock(true);
-                            })
-                    ).whenReleased(
-                            new  InstantCommand(()->{
-                                drivetrain.setHeadingLock(false);
-                            })
-                    );
-
-            new GamepadButton(driverGamepad, GamepadKeys.Button.X)
-                    .whileHeld(
-                            new InstantCommand(()->{
-                                drivetrain.setTargetHeadingDEG(basketAngle);
-                                drivetrain.setHeadingLock(true);
-                            })
-                    ).whenReleased(
-                            new  InstantCommand(()->{
-                                drivetrain.setHeadingLock(false);
-                            })
-                    );
-        }
 
         //endregion
 
@@ -266,9 +186,10 @@ public class TeleOp extends CommandOpMode {
                                 new SequentialCommandGroup(
                                         new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_intaking),
                                         new SetClawPIDCommand(claw, ClawPID.ServoPositions.intaking),
-                                        new WaitCommand(700),
+                                        new IntakeInCommand(intake),
+                                        new WaitUntilCommand(()->!operatorGamepad.getButton(GamepadKeys.Button.Y)),
                                         new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_horizontal),
-                                        new WaitCommand(600),
+                                        new IntakeCustomCommand(intake,0.2),
                                         new SetClawPIDCommand(claw,ClawPID.ServoPositions.safeE)
                                 ),
                                 new ConditionalCommand(
@@ -291,15 +212,15 @@ public class TeleOp extends CommandOpMode {
                                         ),
                                         //if not intaking or depositing
                                         new WaitCommand(0),
-                                        () -> driverGamepad.getButton(GamepadKeys.Button.X)
+                                        () -> operatorGamepad.getButton(GamepadKeys.Button.X)
                                 ),
-                                () -> driverGamepad.getButton(GamepadKeys.Button.B)
+                                () -> operatorGamepad.getButton(GamepadKeys.Button.B)
                         )
 
                 );
 
         //start deposit sample/specimen
-        new GamepadButton(driverGamepad, GamepadKeys.Button.X)
+        new GamepadButton(operatorGamepad, GamepadKeys.Button.X)
                 .whileActiveOnce(
                         new ConditionalCommand(
                                 //Specimens
@@ -320,7 +241,7 @@ public class TeleOp extends CommandOpMode {
                 );
 
         //extension release
-        new GamepadButton(driverGamepad, GamepadKeys.Button.X)
+        new GamepadButton(operatorGamepad, GamepadKeys.Button.X)
                 .whenReleased(
                         new SequentialCommandGroup(
                                 new SetExtensionCommand(extension, claw, 0)
@@ -342,7 +263,7 @@ public class TeleOp extends CommandOpMode {
                 })
         );
 
-        new GamepadButton(driverGamepad, GamepadKeys.Button.BACK).whenPressed(
+        new GamepadButton(operatorGamepad, GamepadKeys.Button.BACK).whenPressed(
                 new InstantCommand(()->{
                     bot.toggleMode();
                 })
