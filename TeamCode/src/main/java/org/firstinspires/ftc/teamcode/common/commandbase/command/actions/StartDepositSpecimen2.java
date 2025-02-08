@@ -6,16 +6,16 @@ import org.firstinspires.ftc.teamcode.common.Bot;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.claw.SetClawPIDCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.extension.SetExtensionCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.pivot.SetPivotAngleCommand;
-import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.ClawPID;
-import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Extension;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Pivot;
 
-public class StartDepositSample extends SequentialCommandGroup {
-    public StartDepositSample(Bot b){
+public class StartDepositSpecimen2 extends SequentialCommandGroup {
+    public StartDepositSpecimen2(Bot b){
         addCommands(
                 new SetPivotAngleCommand(b.getPivot(), b.getClaw(), Pivot.setpoint_vertical),
-                new SetExtensionCommand(b.getExtension(), b.getClaw(), b.getIntake(), b.getExtension().getSamplesTarget(),false),
-                new SetClawPIDCommand(b.getClaw(), ClawPID.ServoPositions.sampling)
+                new SetExtensionCommand(b.getExtension(), b.getClaw(), b.getIntake(), 342,false),
+                new SetClawPIDCommand(b.getClaw(), 80)
+                //114
+
         );
     }
 

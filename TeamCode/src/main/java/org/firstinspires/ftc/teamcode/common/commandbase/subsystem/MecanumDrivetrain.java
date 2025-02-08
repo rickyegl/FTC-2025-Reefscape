@@ -1,8 +1,10 @@
 package org.firstinspires.ftc.teamcode.common.commandbase.subsystem;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.controller.PIDFController;
+import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.arcrobotics.ftclib.geometry.Pose2d;
 import com.arcrobotics.ftclib.geometry.Rotation2d;
 import com.arcrobotics.ftclib.geometry.Vector2d;
@@ -23,7 +25,7 @@ public class MecanumDrivetrain extends SubsystemBase {
 
     private final DcMotorEx frontLeft, frontRight, backLeft, backRight;
     private final PIDFController ascentController;
-    private GoBildaPinpointDriver odo;
+    public GoBildaPinpointDriver odo;
     public static boolean fieldCentric = true, headingLock = false;
 
     public static Pose2D pose;
@@ -94,6 +96,20 @@ public class MecanumDrivetrain extends SubsystemBase {
             double leftPower = ascentController.calculate(backLeft.getCurrentPosition(), targetTicks);
             double rightPower = ascentController.calculate(backRight.getCurrentPosition(), targetTicks);
 
+            if(bot.driver.getButton(GamepadKeys.Button.RIGHT_BUMPER)){
+                bot.rotMultiplier = 0.40;
+            }else{
+                bot.rotMultiplier = 1;
+            }
+
+            if(bot.driver.getButton(GamepadKeys.Button.LEFT_BUMPER)){
+                bot.speed = 0.75;
+            }else{
+                bot.speed = 1;
+            }
+
+
+
             backLeft.setPower(leftPower);
             backRight.setPower(rightPower);
             frontLeft.setPower(leftPower);
@@ -130,7 +146,7 @@ public class MecanumDrivetrain extends SubsystemBase {
             //    rotationSpeedMultiplier = 0.5;
             //}
 
-            rx *= rotationSpeedMultiplier;
+            rx *= bot.rotMultiplier;
 
             if (headingLock) {
                 double currentHeading = pose.getHeading(AngleUnit.RADIANS);

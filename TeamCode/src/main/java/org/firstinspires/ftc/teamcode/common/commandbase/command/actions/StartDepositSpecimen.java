@@ -16,7 +16,7 @@ public class StartDepositSpecimen extends SequentialCommandGroup {
                 new SetPivotAngleCommand(b.getPivot(), b.getClaw(), Pivot.setpoint_vertical),
                 //new SetExtensionCommand(extension, claw, Extension.specimening),
                 //new SetClawPIDCommand(claw, ClawPID.ServoPositions.specimening)
-                new SetExtensionCommand(b.getExtension(), b.getClaw(), b.getIntake(), Extension.specimening),
+                new SetExtensionCommand(b.getExtension(), b.getClaw(), b.getIntake(), Extension.specimening,false),
                 new SetClawPIDCommand(b.getClaw(), ClawPID.ServoPositions.specimening)
         );
     }

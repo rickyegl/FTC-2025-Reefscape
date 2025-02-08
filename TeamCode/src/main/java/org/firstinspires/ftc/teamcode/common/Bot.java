@@ -20,9 +20,8 @@ public class Bot extends Robot {
     private final IMU imu;
     public final Telemetry telem;
     public final HardwareMap hMap;
-    public final Gamepad driver;
-
-    public final Gamepad opertator;
+    public final GamepadEx driver;
+    public final GamepadEx opertator;
 
     public BotState state = BotState.DEPOSIT;
     private final Pivot pivot;
@@ -39,6 +38,8 @@ public class Bot extends Robot {
     public boolean climbing = false;
 
     public double speed = 0.7;
+    public double rotMultiplier = 1;
+
 
     private Levels level = Levels.Up;
     public enum Modes {

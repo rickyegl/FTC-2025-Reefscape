@@ -24,12 +24,15 @@ public class SetExtensionCommand extends CommandBase {
 
     private final Intake intake;
 
+    private final boolean unsafe;
 
-    public SetExtensionCommand(Extension e, ClawPID claw, Intake intake, double setpointcm) {
+
+    public SetExtensionCommand(Extension e, ClawPID claw, Intake intake, double setpointcm, boolean unsafe) {
         extension = e;
         this.setpoint = setpointcm;
         this.claw = claw;
         this.intake = intake;
+        this.unsafe = unsafe;
         extension.setSetpointCM(setpoint);
         addRequirements(extension);
     }
@@ -43,10 +46,15 @@ public class SetExtensionCommand extends CommandBase {
                 //        ()->intake.speed!=0
                 //),
                 new ConditionalCommand(
-                        new SetClawPIDCommand(claw,ClawPID.ServoPositions.safechambering),
-                        new SetClawPIDCommand(claw, ClawPID.ServoPositions.safeE),
-                        ()->extension.getSetpointCM()==extension.getSamplesTarget()
+                        new WaitCommand(0),
+                        new ConditionalCommand(
+                                new SetClawPIDCommand(claw,ClawPID.ServoPositions.safechambering),
+                                new SetClawPIDCommand(claw, ClawPID.ServoPositions.safeE),
+                                ()->extension.previousSetpoint==extension.getSamplesTarget()
                         ),
+                        ()->unsafe
+                ),
+
                 new InstantCommand(()->{
                     extension.setSetpointCM(setpoint);
                 })

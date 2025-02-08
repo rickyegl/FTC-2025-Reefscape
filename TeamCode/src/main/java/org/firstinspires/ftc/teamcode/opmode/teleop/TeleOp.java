@@ -16,9 +16,17 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.teamcode.common.Bot;
+import org.firstinspires.ftc.teamcode.common.commandbase.command.actions.GrabSpecimen;
+import org.firstinspires.ftc.teamcode.common.commandbase.command.actions.PutSample;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.actions.PutSpecimen;
+import org.firstinspires.ftc.teamcode.common.commandbase.command.actions.PutSpecimen2;
+import org.firstinspires.ftc.teamcode.common.commandbase.command.actions.PutSpecimen2v2;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.actions.StartDepositSample;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.actions.StartDepositSpecimen;
+import org.firstinspires.ftc.teamcode.common.commandbase.command.actions.StartDepositSpecimen2;
+import org.firstinspires.ftc.teamcode.common.commandbase.command.actions.StartDepositSpecimen2v2;
+import org.firstinspires.ftc.teamcode.common.commandbase.command.actions.StartIntakeCommand;
+import org.firstinspires.ftc.teamcode.common.commandbase.command.claw.SetClawCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.claw.SetClawPIDCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.drive.TeleOpDriveCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.extension.ManualExtensionCommand;
@@ -80,14 +88,7 @@ public class TeleOp extends CommandOpMode {
                 () -> bot.speed
         );
         bot.speed = 0.75;
-        new GamepadButton(driverGamepad, GamepadKeys.Button.RIGHT_BUMPER).toggleWhenActive(
-                new InstantCommand(()->{
-                    bot.speed = 0.75;
-                }),
-                new InstantCommand(()-> {
-                    bot.speed = 1;
-                })
-        );
+
 
 
 
@@ -169,19 +170,12 @@ public class TeleOp extends CommandOpMode {
 
         //region Actions
 
-        new GamepadButton(operatorGamepad, GamepadKeys.Button.B)
-                .whileActiveOnce(
-                        new SequentialCommandGroup(
-                                new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_intaking_start),
-                                new SetExtensionCommand(extension, claw,intake, Extension.intakeMaxExtension),
-                                new SetClawPIDCommand(claw, ClawPID.ServoPositions.preintaking)
-                        )
-                );
+
 
         new GamepadButton(operatorGamepad, GamepadKeys.Button.B)
                 .whenReleased(
                         new SequentialCommandGroup(
-                                new SetExtensionCommand(extension,  claw,intake, 0),
+                                new SetExtensionCommand(extension,  claw,intake, 0,true),
                                 new SetClawPIDCommand(claw, ClawPID.ServoPositions.intaking)
                         )
                 );
@@ -189,8 +183,18 @@ public class TeleOp extends CommandOpMode {
         new GamepadButton(operatorGamepad, GamepadKeys.Button.B)
                 .whenReleased(
                     new SequentialCommandGroup(
-                            new SetExtensionCommand(extension, claw,intake, 0)
+                            new SetExtensionCommand(extension, claw,intake, 0,false)
                     )/*.interruptOn(() -> driverGamepad.getButton(GamepadKeys.Button.B))*/
+                );
+
+
+        new GamepadButton(operatorGamepad, GamepadKeys.Button.B)
+                .whileActiveOnce(
+                        new SequentialCommandGroup(
+                                new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_intaking_start),
+                                new SetExtensionCommand(extension, claw,intake, Extension.intakeMaxExtension,false),
+                                new SetClawPIDCommand(claw, ClawPID.ServoPositions.preintaking)
+                        )
                 );
 
 
@@ -199,36 +203,14 @@ public class TeleOp extends CommandOpMode {
                 .whenActive(
                         new ConditionalCommand(
                                 //if intaking
-                                new SequentialCommandGroup(
-                                        new SetClawPIDCommand(claw, ClawPID.ServoPositions.intaking),
-                                        new IntakeInCommand(intake),
-                                        new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_intaking),
-
-                                        //new InstantCommand(()->{
-                                        //    pivot.pivotController.setF(0);
-                                        //    pivot.overrideF = true;
-                                        //}),
-                                        new WaitUntilCommand(()->!operatorGamepad.getButton(GamepadKeys.Button.Y)),
-                                        ///new SetClawPIDCommand(claw, ClawPID.ServoPositions.preintaking),
-                                        //new InstantCommand(()->{
-                                        //    pivot.overrideF = false;
-                                        //}),
-                                        //new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_horizontal),
-                                        new IntakeCustomCommand(intake,0.2),
-                                        new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_horizontal)
-                                        //new SetClawPIDCommand(claw,ClawPID.ServoPositions.safeE)
-                                ),
+                                new StartIntakeCommand(bot),
                                 new ConditionalCommand(
                                         //if depositing
                                         new ConditionalCommand(
                                                 //Put Specimen
-                                                new PutSpecimen(bot),
+                                                new PutSpecimen2v2(bot),
                                                 //Put Sample
-                                                new SequentialCommandGroup(
-                                                        new IntakeOutCommand(intake),
-                                                        new WaitUntilCommand(()->!operatorGamepad.getButton(GamepadKeys.Button.Y)),
-                                                        new IntakeStopCommand(intake)
-                                                ),
+                                                new PutSample(bot),
                                                 () -> bot.getMode() == Bot.Modes.SPECIMENS
                                         ),
                                         //if not intaking or depositing
@@ -245,19 +227,19 @@ public class TeleOp extends CommandOpMode {
                 .whileActiveOnce(
                         new ConditionalCommand(
                                 //Specimens
-                                new StartDepositSpecimen(bot),
+                                new StartDepositSpecimen2v2(bot),
                                 //Samples
                                 new StartDepositSample(bot),
                                 () -> bot.getMode() == Bot.Modes.SPECIMENS
                         )
 
-                );
+                );//2 derecha
 
         //extension release
         new GamepadButton(operatorGamepad, GamepadKeys.Button.X)
                 .whenReleased(
                         new SequentialCommandGroup(
-                                new SetExtensionCommand(extension, claw,intake, 0)
+                                new SetExtensionCommand(extension, claw,intake, 0,false)
                         )/*.interruptOn(() -> driverGamepad.getButton(GamepadKeys.Button.X))*/
                 );
 
@@ -273,6 +255,12 @@ public class TeleOp extends CommandOpMode {
         new GamepadButton(operatorGamepad, GamepadKeys.Button.BACK).whenPressed(
                 new InstantCommand(()->{
                     bot.toggleMode();
+                })
+        );
+
+        new GamepadButton(driverGamepad, GamepadKeys.Button.BACK).whenPressed(
+                new InstantCommand(()->{
+                    bot.getDrivetrain().odo.resetPosAndIMU();
                 })
         );
 
@@ -294,7 +282,7 @@ public class TeleOp extends CommandOpMode {
         new GamepadButton(operatorGamepad, GamepadKeys.Button.LEFT_STICK_BUTTON).whileActiveOnce(
                 new SequentialCommandGroup(
                         new ParallelCommandGroup(
-                                new SetExtensionCommand(extension, claw,intake, 1325),
+                                new SetExtensionCommand(extension, claw,intake, 1325,false),
                                 new SetPivotAngleCommand(pivot,claw,39)
                         ),
                         new WaitUntilCommand(()->operatorGamepad.getButton(GamepadKeys.Button.RIGHT_STICK_BUTTON)),
@@ -310,7 +298,7 @@ public class TeleOp extends CommandOpMode {
                                     //extension.multiplyP();
                                 }),
                                 new SequentialCommandGroup(
-                                        new SetExtensionCommand(extension, claw,intake, -5),
+                                        new SetExtensionCommand(extension, claw,intake, -5,false),
                                         new InstantCommand(()->{
                                             //extension.multiplyP();
                                         })
@@ -330,9 +318,12 @@ public class TeleOp extends CommandOpMode {
                 )
         );
 
-        new GamepadButton(operatorGamepad,GamepadKeys.Button.LEFT_BUMPER).whenReleased(
+        new GamepadButton(operatorGamepad,GamepadKeys.Button.LEFT_BUMPER).whenPressed(
                 new SequentialCommandGroup(
-                        new IntakeInCommand(intake)
+                        new GrabSpecimen(bot)
+                        //new WaitUntilCommand(()->!operatorGamepad.getButton(GamepadKeys.Button.LEFT_BUMPER))
+                        //new SetClawPIDCommand(claw,)
+
                 )
         );
 
@@ -340,7 +331,7 @@ public class TeleOp extends CommandOpMode {
                 new ConditionalCommand(
                         new WaitCommand(0),
                         new ParallelCommandGroup(
-                                new SetExtensionCommand(extension, claw,intake, 1),
+                                new SetExtensionCommand(extension, claw,intake, 1,false),
                                 new SetPivotAngleCommand(pivot,claw,1)
                         ),
                         () -> bot.climbing

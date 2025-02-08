@@ -17,7 +17,10 @@ public class Extension extends SubsystemBase {
 
     private final PIDFController extensionController;
     public static double setpointCM = 0.0, highBarTarget = 1070, lowBarTarget = 17.0, lowBasketTarget = 1500.0, highBasketTarget = 3250, ticksperCM = 1;//10.37339803;
+    public double previousSetpoint = 0;
     public static double minExtension = 0.0, depositMaxExtension = 30, intakeMaxExtension = 1800, specimening = 550;
+
+    public static double samples2 = 75;
     public double getBarTarget() {
         if (bot.getLevel() == Bot.Levels.Up) {
             return highBarTarget;
@@ -82,6 +85,7 @@ public class Extension extends SubsystemBase {
      * @param setpoint the setpoint in centimeters
      */
     public void setSetpointCM(double setpoint) {
+        previousSetpoint = setpointCM;
         setpointCM = setpoint;
     }
 

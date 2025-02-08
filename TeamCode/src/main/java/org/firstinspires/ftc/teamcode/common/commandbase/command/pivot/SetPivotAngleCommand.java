@@ -28,14 +28,18 @@ public class SetPivotAngleCommand extends CommandBase {
         this.angleDeg = angleDeg;
         this.ignoreSafety = ignoreSafety;
         this.claw = claw;
-        addRequirements(pivot);
+        //addRequirements(pivot);
     }
 
     @Override
     public void initialize() {
         new SequentialCommandGroup(
                 new ConditionalCommand(
-                        new SetClawPIDCommand(claw, ClawPID.ServoPositions.safeP),
+                        new ConditionalCommand(
+                                new WaitCommand(0),
+                                new SetClawPIDCommand(claw, ClawPID.ServoPositions.safeP),
+                                ()->ignoreSafety
+                        ),
                         new WaitCommand(0),
                         ()->Math.abs(pivot.getPositionDEG())-Math.abs(angleDeg)>30
                 ),

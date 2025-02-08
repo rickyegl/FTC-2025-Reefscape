@@ -7,6 +7,7 @@ import static org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Extens
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.controller.PIDFController;
+import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -24,7 +25,7 @@ public class Pivot extends SubsystemBase {
     public final DcMotor pivotMotorL;
     public final DcMotor pivotMotorR;
 
-    public static final double setpoint_intaking = 89, setpoint_vertical = 0, setpoint_horizontal = 87, setpoint_intaking_start = 80, setpoint_climb = 44;
+    public static final double setpoint_intaking = 93, setpoint_vertical = 0, setpoint_horizontal = 87, setpoint_intaking_start = 80, setpoint_climb = 44;
 
     public final PIDFController pivotController;
     public boolean overrideF = false;
@@ -72,6 +73,11 @@ public class Pivot extends SubsystemBase {
 
 
         if(!overrideF){
+            if(bot.opertator.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER)>10) {
+                pivotController.setF(pivot_h_kF*2);
+            }else if(bot.opertator.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER)>10) {
+                pivotController.setF(pivot_h_kF*-2);
+            }else
             if(bot.getExtension().getPositionCM()>1300&&getSetpointDEG()>80){
                 pivotController.setF(pivot_h_kF);
                 //pivotController.setP(pivot_kP);
