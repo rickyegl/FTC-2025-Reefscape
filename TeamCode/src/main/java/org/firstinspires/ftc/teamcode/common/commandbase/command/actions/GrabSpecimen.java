@@ -16,7 +16,7 @@ public class GrabSpecimen extends SequentialCommandGroup {
     public GrabSpecimen(Bot b){
         addCommands(
                 new SetPivotAngleCommand(b.getPivot(),b.getClaw(),93),
-                new SetClawPIDCommand(b.getClaw(),98),
+                new SetClawPIDCommand(b.getClaw(),95),
                 new IntakeInCommand(b.getIntake())
         );
     }

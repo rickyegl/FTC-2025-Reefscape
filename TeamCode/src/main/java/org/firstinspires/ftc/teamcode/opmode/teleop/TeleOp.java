@@ -16,6 +16,8 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.teamcode.common.Bot;
+import org.firstinspires.ftc.teamcode.common.commandbase.command.actions.EndIntake2Command;
+import org.firstinspires.ftc.teamcode.common.commandbase.command.actions.EndIntakeCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.actions.GrabSpecimen;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.actions.PutSample;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.actions.PutSpecimen;
@@ -25,6 +27,7 @@ import org.firstinspires.ftc.teamcode.common.commandbase.command.actions.StartDe
 import org.firstinspires.ftc.teamcode.common.commandbase.command.actions.StartDepositSpecimen;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.actions.StartDepositSpecimen2;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.actions.StartDepositSpecimen2v2;
+import org.firstinspires.ftc.teamcode.common.commandbase.command.actions.StartIntake2Command;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.actions.StartIntakeCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.claw.SetClawCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.claw.SetClawPIDCommand;
@@ -170,31 +173,30 @@ public class TeleOp extends CommandOpMode {
 
         //region Actions
 
-
-
         new GamepadButton(operatorGamepad, GamepadKeys.Button.B)
                 .whenReleased(
                         new SequentialCommandGroup(
                                 new SetExtensionCommand(extension,  claw,intake, 0,true),
-                                new SetClawPIDCommand(claw, ClawPID.ServoPositions.intaking)
+                                new SetClawPIDCommand(claw, ClawPID.ServoPositions.placing)
                         )
-                );
-
-        new GamepadButton(operatorGamepad, GamepadKeys.Button.B)
-                .whenReleased(
-                    new SequentialCommandGroup(
-                            new SetExtensionCommand(extension, claw,intake, 0,false)
-                    )/*.interruptOn(() -> driverGamepad.getButton(GamepadKeys.Button.B))*/
                 );
 
 
         new GamepadButton(operatorGamepad, GamepadKeys.Button.B)
                 .whileActiveOnce(
-                        new SequentialCommandGroup(
-                                new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_intaking_start),
-                                new SetExtensionCommand(extension, claw,intake, Extension.intakeMaxExtension,false),
-                                new SetClawPIDCommand(claw, ClawPID.ServoPositions.preintaking)
+                        new StartIntakeCommand(bot)
+                );
+
+        //Define Y Action
+        new GamepadButton(operatorGamepad, GamepadKeys.Button.Y)
+                .whenPressed(
+                        new ConditionalCommand(
+                                //if intaking
+                                new EndIntakeCommand(bot),
+                                new WaitCommand(0),
+                                () -> operatorGamepad.getButton(GamepadKeys.Button.B)
                         )
+
                 );
 
 
@@ -203,7 +205,7 @@ public class TeleOp extends CommandOpMode {
                 .whenActive(
                         new ConditionalCommand(
                                 //if intaking
-                                new StartIntakeCommand(bot),
+                                new WaitCommand(0),
                                 new ConditionalCommand(
                                         //if depositing
                                         new ConditionalCommand(
@@ -264,17 +266,19 @@ public class TeleOp extends CommandOpMode {
                 })
         );
 
-        new GamepadButton(operatorGamepad, GamepadKeys.Button.DPAD_UP).whenPressed(
-                new InstantCommand(()->{
-                    bot.setLevel(Bot.Levels.Up);
-                })
-        );
+        //new GamepadButton(operatorGamepad, GamepadKeys.Button.DPAD_UP).whenPressed(
+        //        new InstantCommand(()->{
+        //            bot.setLevel(Bot.Levels.Up);
+        //        })
+        //);
 
-        new GamepadButton(operatorGamepad, GamepadKeys.Button.DPAD_DOWN).whenPressed(
-                new InstantCommand(()->{
-                    bot.setLevel(Bot.Levels.Down);
-                })
-        );
+        //new GamepadButton(operatorGamepad, GamepadKeys.Button.DPAD_DOWN).whenPressed(
+        //        new InstantCommand(()->{
+        //            bot.setLevel(Bot.Levels.Down);
+        //        })
+        //);
+
+
 
         //endregion
 
@@ -289,6 +293,7 @@ public class TeleOp extends CommandOpMode {
                         new InstantCommand(()->{
                             bot.climbing = true;
                         }),
+                        new IntakeStopCommand(bot.getIntake()),
                         new InstantCommand(()->{
                             // pivot.multiplyP();
                         }),

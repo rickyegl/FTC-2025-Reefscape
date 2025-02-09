@@ -21,7 +21,7 @@ public class ClawPID extends SubsystemBase {
     private double angleOffset = 0;
     @com.acmerobotics.dashboard.config.Config
     public static class ServoPositions {
-        public static double placing = 80, safeP = 0, safeE = 27, intaking = 250, sampling = 75.83984375, specimening = 140,preintaking = 143,safechambering = 170;
+        public static double placing = 80, safeP = 0, safeE = 27, intaking = 250, sampling = 120, specimening = 140,preintaking = 240,safechambering = 170,linear = 0;
     }
     public ClawPID(Bot bot) {
         this.bot = bot;
@@ -32,11 +32,11 @@ public class ClawPID extends SubsystemBase {
     }
     @Override
     public void periodic() {
-        if(getPositionDeg()>240){
+        if(bot.getExtension().getSamplesTarget()>240){
             pd.setF(0.0);
         }else{
             //start pose
-            pd.setF(Config.claw_kF);
+            //pd.setF(Config.claw_kF);
         }
         double clawPower = pd.calculate(getPositionDeg(),currentPosition);
         clawPower = MathUtils.clamp(clawPower,-0.9,0.8);

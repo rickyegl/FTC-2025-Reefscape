@@ -25,7 +25,7 @@ public class Pivot extends SubsystemBase {
     public final DcMotor pivotMotorL;
     public final DcMotor pivotMotorR;
 
-    public static final double setpoint_intaking = 93, setpoint_vertical = 0, setpoint_horizontal = 87, setpoint_intaking_start = 80, setpoint_climb = 44;
+    public static final double setpoint_intaking = 93, setpoint_vertical = 0, setpoint_horizontal = 87, setpoint_intaking_start = 78, setpoint_climb = 44, setpoint_sampling = 38;
 
     public final PIDFController pivotController;
     public boolean overrideF = false;

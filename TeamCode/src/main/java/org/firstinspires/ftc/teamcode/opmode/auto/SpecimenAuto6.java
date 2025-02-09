@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.opmode.auto;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.CommandScheduler;
-import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
@@ -29,9 +28,9 @@ import pedroPathing.constants.LConstants;
 //ParallelCommandGroup                  los comandos dentro corren en paralelo
 //new WaitCommand(1000),                espera 1000 milisegundos
 
-@Autonomous(name="Specimen Auto2")
+@Autonomous(name="Specimen Auto6")
 //@Autonomous(name="Specimen Auto", preselectTeleOp="TeleOp")
-public class SpecimenAuto2 extends LinearOpMode {
+public class SpecimenAuto6 extends LinearOpMode {
 
     public static Pose startingPose = new Pose(9, 55, 0);
     public static Pose parkPose = new Pose(18, 26, 0);

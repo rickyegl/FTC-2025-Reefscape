@@ -22,6 +22,8 @@ import org.firstinspires.ftc.teamcode.common.Bot;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.actions.PutSpecimen2v2;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.actions.StartDepositSpecimen;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.drive.FollowPathCommand;
+import org.firstinspires.ftc.teamcode.common.commandbase.command.pivot.SetPivotAngleCommand;
+import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Pivot;
 
 import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
@@ -90,8 +92,29 @@ public class SpecimenAuto3 extends LinearOpMode {
                                 .build()
                         )
                 ),
+                new WaitCommand(3000),
+                new SetPivotAngleCommand(bot.getPivot(), bot.getClaw(), Pivot.setpoint_vertical),
+                new WaitCommand(3000),
                 new StartDepositSpecimen(bot),
                 new WaitCommand(3000),
+                new FollowPathCommand(f, f.pathBuilder()
+                        .addPath(
+                                new BezierCurve(
+                                        new Point(new Pose(18.467532467532468, 39.506493506493506, Math.toRadians(0))),//preparar
+                                        new Point(new Pose(upX, 34.36363636363637, Math.toRadians(0)))//subir
+                                        //new Point(new Pose(64.05194805194806, 9.818181818181825, Math.toRadians(0)))
+                                )
+                        )
+                        .setConstantHeadingInterpolation(score1.getHeading())
+                        //sample 1
+                        .addPath(
+                                new BezierLine(
+                                        new Point(new Pose(upX, 34.36363636363637, Math.toRadians(0))),
+                                        new Point(new Pose(upX, push1Y, Math.toRadians(0)))//lateral 1
+                                )
+                        )
+                        .setConstantHeadingInterpolation(score1.getHeading())
+                        .build()),
                 new PutSpecimen2v2(bot),
 
                 new WaitCommand(100000),
@@ -143,6 +166,7 @@ public class SpecimenAuto3 extends LinearOpMode {
                                         )
                                 )
                                 .setConstantHeadingInterpolation(score1.getHeading())
+                                /*
                                 .addPath(
                                         new BezierLine(
                                                 new Point(new Pose(downX, push2Y, Math.toRadians(0))),//bajar
@@ -152,6 +176,7 @@ public class SpecimenAuto3 extends LinearOpMode {
                                 .setConstantHeadingInterpolation(score1.getHeading())
 
                                 //sample 3
+
                                 .addPath(
                                         new BezierLine(
                                                 new Point(new Pose(upX, push2Y, Math.toRadians(0))),//subir
@@ -165,7 +190,7 @@ public class SpecimenAuto3 extends LinearOpMode {
                                                 new Point(new Pose(downX, push3Y, Math.toRadians(0)))//bajar
                                         )
                                 )
-                                .setConstantHeadingInterpolation(score1.getHeading())
+                                .setConstantHeadingInterpolation(score1.getHeading())*/
                                 //.setLinearHeadingInterpolation(score1.getHeading(), intake1.getHeading())
                                 .build()
                         )
