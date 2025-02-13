@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.common;
 
+import android.view.Display;
+
 import com.arcrobotics.ftclib.command.Robot;
 import com.arcrobotics.ftclib.geometry.Pose2d;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
@@ -107,6 +109,9 @@ public class Bot extends Robot {
     public void toggleMode() {
         mode = mode == Modes.SPECIMENS ? Modes.SAMPLES : Modes.SPECIMENS;
     }
+
+    public void setModeSpecimens(){mode = Modes.SPECIMENS;}
+    public void setModeSamples(){mode = Modes.SAMPLES;}
 
     public Levels getLevel() { return level; }
 

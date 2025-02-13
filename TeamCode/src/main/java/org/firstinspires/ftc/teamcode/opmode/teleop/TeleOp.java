@@ -97,7 +97,7 @@ public class TeleOp extends CommandOpMode {
         register(intake);
         register(claw);
 
-        //region HLock
+         //region HLock
         double basketAngle = 180+45;
         double transformangle = -45;
 
