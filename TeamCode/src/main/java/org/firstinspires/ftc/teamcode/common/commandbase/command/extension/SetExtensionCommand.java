@@ -7,7 +7,7 @@ import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 
 import org.firstinspires.ftc.teamcode.common.Config;
-import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Claw;
+import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.ClawServo;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Extension;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Pivot;
 
@@ -19,9 +19,9 @@ public class SetExtensionCommand extends CommandBase {
 
     private final Extension extension;
     private final double setpoint;
-    private final Claw claw;
+    private final ClawServo claw;
 
-    public SetExtensionCommand(Extension e, Claw claw, double setpointcm) {
+    public SetExtensionCommand(Extension e, ClawServo claw, double setpointcm) {
         extension = e;
         this.setpoint = setpointcm;
         this.claw = claw;
@@ -34,7 +34,7 @@ public class SetExtensionCommand extends CommandBase {
         new ConditionalCommand(
                 new SequentialCommandGroup(
                         new InstantCommand(()->{
-                            claw.setPosition(1);
+                            //claw.setPosition(1);
                         }),
                         new WaitCommand(500),
                         new InstantCommand(()->{
@@ -46,7 +46,7 @@ public class SetExtensionCommand extends CommandBase {
                             extension.setSetpointCM(setpoint);
                         })
                 ),
-                ()->claw.clawPivot.getPosition()!= Claw.ServoPositions.safe2
+                ()->claw.clawPivot.getPosition()!= ClawServo.ServoPositions.safe2
 
         ).schedule();
     }

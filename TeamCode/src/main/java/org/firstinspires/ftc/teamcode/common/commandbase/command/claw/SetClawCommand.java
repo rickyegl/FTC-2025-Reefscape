@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.common.commandbase.command.claw;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 
-import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Claw;
+import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.ClawServo;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Intake;
 
 
@@ -12,10 +12,10 @@ import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Intake;
  */
 public class SetClawCommand extends CommandBase {
 
-    private final Claw claw;
+    private final ClawServo claw;
     private final double position;
 
-    public SetClawCommand(Claw claw, double position) {
+    public SetClawCommand(ClawServo claw, double position) {
         this.claw = claw;
         this.position = position;
     }

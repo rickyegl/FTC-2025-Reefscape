@@ -8,7 +8,7 @@ import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import org.firstinspires.ftc.teamcode.common.Bot;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.extension.SetExtensionCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.pivot.SetPivotAngleCommand;
-import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Claw;
+import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.ClawServo;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Extension;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Pivot;
 
@@ -17,7 +17,7 @@ public class SetPositionScore extends CommandBase {
     private Bot bot;
     private Pivot pivot;
     private Extension extension;
-    private Claw claw;
+    private ClawServo claw;
 
     private static double HIGH_SPECIMEN_ANGLE = 45, LOW_SPECIMEN_ANGLE = 30;
     private static double HIGH_SPECIMEN_LENGTH = 20, LOW_SPECIMEN_LENGTH = 0;

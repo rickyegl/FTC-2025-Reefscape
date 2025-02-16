@@ -7,7 +7,7 @@ import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 
 import org.firstinspires.ftc.teamcode.common.Config;
-import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Claw;
+import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.ClawServo;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Pivot;
 
 public class SetPivotAngleCommand extends CommandBase {
@@ -16,13 +16,13 @@ public class SetPivotAngleCommand extends CommandBase {
     private final double angleDeg;
     private final boolean ignoreSafety;
 
-    private final Claw claw;
+    private final ClawServo claw;
 
-    public SetPivotAngleCommand(Pivot pivot, Claw claw, double angleDeg) {
+    public SetPivotAngleCommand(Pivot pivot, ClawServo claw, double angleDeg) {
         this(pivot, claw, angleDeg, false);
     }
 
-    public SetPivotAngleCommand(Pivot pivot, Claw claw, double angleDeg, boolean ignoreSafety) {
+    public SetPivotAngleCommand(Pivot pivot, ClawServo claw, double angleDeg, boolean ignoreSafety) {
         this.pivot = pivot;
         this.angleDeg = angleDeg;
         this.ignoreSafety = ignoreSafety;

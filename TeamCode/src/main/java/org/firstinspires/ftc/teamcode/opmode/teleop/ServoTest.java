@@ -25,7 +25,7 @@ public class ServoTest extends CommandOpMode {
 
         //driverGamepad = new GamepadEx(gamepad1);
 
-        servo = hardwareMap.get(Servo.class, "claw");
+        servo = hardwareMap.get(Servo.class, "clawServo");
 
         waitForStart();
         while (opModeIsActive()){
