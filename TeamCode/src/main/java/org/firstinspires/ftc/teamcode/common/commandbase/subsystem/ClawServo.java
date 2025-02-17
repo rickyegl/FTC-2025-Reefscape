@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.common.Bot;
 
+
 @com.acmerobotics.dashboard.config.Config
 public class ClawServo extends SubsystemBase {
     private final Bot bot;
@@ -18,7 +19,7 @@ public class ClawServo extends SubsystemBase {
     private double currentPosition = ServoPositions.placing;
     @com.acmerobotics.dashboard.config.Config
     public static class ServoPositions {
-        public static double placing = 0.4, safe = 0, intaking = 1, safe2= 0;
+        public static double placing = 0.4, safe = 0, intaking = 0.73, safe2= 0;
     }
     public ClawServo(Bot bot) {
         this.bot = bot;

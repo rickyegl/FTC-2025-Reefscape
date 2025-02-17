@@ -436,7 +436,9 @@ public class TeleOp extends CommandOpMode {
                 new ParallelCommandGroup(
                         new SetBotStateCommand(bot, BotState.INTAKE),
                         new SetExtensionCommand(bot.getExtension(), claw,  0),
-                        new SetPivotAngleCommand(bot.getPivot(), claw, Pivot.setpoint_horizontal)
+                        new SetPivotAngleCommand(bot.getPivot(), claw, Pivot.setpoint_horizontal),
+                        new SetClawCommand(bot.getClaw(),ClawServo.ServoPositions.safe)
+
                 )
         );
 

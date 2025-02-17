@@ -35,7 +35,7 @@ public class SetPivotAngleCommand extends CommandBase {
         new ConditionalCommand(
                 new SequentialCommandGroup(
                         new InstantCommand(()->{
-                            claw.setPosition(1);
+                            claw.setPosition(ClawServo.ServoPositions.safe);
                         }),
                         new WaitCommand(500),
                         new InstantCommand(()->{
