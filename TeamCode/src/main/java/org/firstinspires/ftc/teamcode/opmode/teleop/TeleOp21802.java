@@ -48,7 +48,7 @@ public class TeleOp21802 extends CommandOpMode {
 
         //gamepad1.setLedColor(255, 255, 0, Gamepad.LED_DURATION_CONTINUOUS);
 
-        bot = new Bot(telem, hardwareMap, gamepad1, enableDrive);
+        bot = new Bot(telem, hardwareMap, driverGamepad, mechanismGamepad, enableDrive);
 
         register(drivetrain);
 

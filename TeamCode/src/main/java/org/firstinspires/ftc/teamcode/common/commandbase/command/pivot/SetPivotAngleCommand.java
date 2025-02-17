@@ -7,6 +7,7 @@ import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 
 import org.firstinspires.ftc.teamcode.common.Config;
+import org.firstinspires.ftc.teamcode.common.commandbase.command.claw.SetClawCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.ClawServo;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Pivot;
 
@@ -34,10 +35,8 @@ public class SetPivotAngleCommand extends CommandBase {
     public void initialize() {
         new ConditionalCommand(
                 new SequentialCommandGroup(
-                        new InstantCommand(()->{
-                            claw.setPosition(ClawServo.ServoPositions.safe);
-                        }),
-                        new WaitCommand(500),
+                        new SetClawCommand(claw,ClawServo.ServoPositions.safe),
+                        new WaitCommand(600),
                         new InstantCommand(()->{
                             if (ignoreSafety) {
                                 pivot.setSetpointIGNORE(angleDeg);
@@ -53,7 +52,7 @@ public class SetPivotAngleCommand extends CommandBase {
                         pivot.setSetpointDEG(angleDeg);
                     }
                 }),
-                ()->claw.clawPivot.getPosition()!=1
+                ()->claw.clawPivot.getPosition()!=ClawServo.ServoPositions.safe
         ).schedule();
 
     }

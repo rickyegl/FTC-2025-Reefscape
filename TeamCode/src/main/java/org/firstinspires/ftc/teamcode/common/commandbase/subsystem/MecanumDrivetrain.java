@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.common.commandbase.subsystem;
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.controller.PIDFController;
+import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.arcrobotics.ftclib.geometry.Pose2d;
 import com.arcrobotics.ftclib.geometry.Rotation2d;
 import com.arcrobotics.ftclib.geometry.Vector2d;
@@ -23,7 +24,7 @@ public class MecanumDrivetrain extends SubsystemBase {
 
     private final DcMotorEx frontLeft, frontRight, backLeft, backRight;
     private final PIDFController ascentController;
-    private GoBildaPinpointDriver odo;
+    public GoBildaPinpointDriver odo;
     public static boolean fieldCentric = true, headingLock = false;
 
     public static Pose2D pose;
@@ -122,6 +123,13 @@ public class MecanumDrivetrain extends SubsystemBase {
             double y = -leftStick.getY() * multiplier;
 
             //double extensionPosition = bot.getExtension().getPositionCM();
+            if(bot.driver.getButton(GamepadKeys.Button.RIGHT_BUMPER)) {
+                multiplier *= 0.25;  // Velocidad reducida al 25%
+            } else if(bot.driver.getButton(GamepadKeys.Button.LEFT_BUMPER)) {
+                multiplier *= 0.5;   // Velocidad reducida al 50%
+            } else {
+                multiplier *= 1;
+            }
 
             double extensionThreshold = 20;
             double rotationSpeedMultiplier = 1.0;
@@ -129,6 +137,8 @@ public class MecanumDrivetrain extends SubsystemBase {
             //if (extensionPosition > extensionThreshold) {
             //    rotationSpeedMultiplier = 0.5;
             //}
+
+
 
             rx *= rotationSpeedMultiplier;
 
@@ -157,10 +167,10 @@ public class MecanumDrivetrain extends SubsystemBase {
                 double[] powers = {frontLeftPower, frontRightPower, backLeftPower, backRightPower};
                 double[] normalizedPowers = normalizeWheelSpeeds(powers);
 
-                frontLeft.setPower(normalizedPowers[0]);
-                frontRight.setPower(normalizedPowers[1]);
-                backLeft.setPower(normalizedPowers[2]);
-                backRight.setPower(normalizedPowers[3]);
+                frontLeft.setPower(normalizedPowers[0]*multiplier);
+                frontRight.setPower(normalizedPowers[1]*multiplier);
+                backLeft.setPower(normalizedPowers[2]*multiplier);
+                backRight.setPower(normalizedPowers[3]*multiplier);
 
                 return;
             }
@@ -181,10 +191,10 @@ public class MecanumDrivetrain extends SubsystemBase {
             double[] powers = {frontLeftPower, frontRightPower, backLeftPower, backRightPower};
             double[] normalizedPowers = normalizeWheelSpeeds(powers);
 
-            frontLeft.setPower(normalizedPowers[0]);
-            frontRight.setPower(normalizedPowers[1]);
-            backLeft.setPower(normalizedPowers[2]);
-            backRight.setPower(normalizedPowers[3]);
+            frontLeft.setPower(normalizedPowers[0]*multiplier);
+            frontRight.setPower(normalizedPowers[1]*multiplier);
+            backLeft.setPower(normalizedPowers[2]*multiplier);
+            backRight.setPower(normalizedPowers[3]*multiplier);
         }
     }
 

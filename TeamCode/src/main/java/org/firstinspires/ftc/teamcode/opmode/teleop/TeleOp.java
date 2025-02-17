@@ -23,6 +23,7 @@ import org.firstinspires.ftc.teamcode.common.Bot;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.claw.SetClawCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.drive.TeleOpDriveCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.extension.ManualExtensionCommand;
+import org.firstinspires.ftc.teamcode.common.commandbase.command.extension.ManualIntakeCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.extension.SetExtensionCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.intake.IntakeInCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.intake.IntakeOutCommand;
@@ -68,7 +69,7 @@ public class TeleOp extends CommandOpMode {
 
         //gamepad1.setLedColor(255, 255, 0, Gamepad.LED_DURATION_CONTINUOUS);
 
-        bot = new Bot(telem, hardwareMap, gamepad1, enableDrive);
+        bot = new Bot(telem, hardwareMap, driverGamepad, operatorGamepad, enableDrive);
 
         //region Drivetrain
         drivetrain = bot.getDrivetrain();
@@ -203,11 +204,20 @@ public class TeleOp extends CommandOpMode {
         //region Extension
         extension = bot.getExtension();
 
+        /*
         ManualExtensionCommand extensionCommand = new ManualExtensionCommand(
                 extension,
                 () -> operatorGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER),
                 () -> operatorGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER)
         );
+        */
+
+        ManualIntakeCommand intakeCommand = new ManualIntakeCommand(
+                intake,
+                () -> operatorGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER),
+                () -> operatorGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER)
+        );
+
 
         //Button toggleElevator = (new GamepadButton(driverGamepad, GamepadKeys.Button.A))
         //        .whenPressed(
@@ -234,7 +244,8 @@ public class TeleOp extends CommandOpMode {
                 );
 
         register(extension);
-        extension.setDefaultCommand(extensionCommand);
+        //extension.setDefaultCommand(extensionCommand);
+        intake.setDefaultCommand(intakeCommand);
         //endregion
 
         //region Actions
@@ -244,7 +255,7 @@ public class TeleOp extends CommandOpMode {
                 .whileActiveOnce(
                         new SequentialCommandGroup(
                                 new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_intaking),
-                                new IntakeInCommand(intake),
+                                //new IntakeInCommand(intake),
                                 new SetClawCommand(claw, ClawServo.ServoPositions.intaking),
                                 new SetExtensionCommand(extension, claw, Extension.intakeMaxExtension)
                         )
@@ -253,7 +264,9 @@ public class TeleOp extends CommandOpMode {
         new GamepadButton(operatorGamepad, GamepadKeys.Button.B)
                 .whenReleased(
                         new SequentialCommandGroup(
+                                new SetPivotAngleCommand(pivot,claw,Pivot.setpoint_horizontal),
                                 new SetClawCommand(claw, ClawServo.ServoPositions.safe),
+                                new WaitCommand(300),
                                 new SetExtensionCommand(extension,  claw, 0)
                         )
                 );
@@ -303,8 +316,8 @@ public class TeleOp extends CommandOpMode {
                 );
 
         //start deposit sample/specimen
-        new GamepadButton(driverGamepad, GamepadKeys.Button.X)
-                .whileActiveOnce(
+        new GamepadButton(operatorGamepad, GamepadKeys.Button.X)
+                .whenPressed(
                         new ConditionalCommand(
                                 //Specimens
                                 new SequentialCommandGroup(
@@ -327,7 +340,7 @@ public class TeleOp extends CommandOpMode {
                 );
 
         //extension release
-        new GamepadButton(driverGamepad, GamepadKeys.Button.X)
+        new GamepadButton(operatorGamepad, GamepadKeys.Button.X)
                 .whenReleased(
                         new SequentialCommandGroup(
                                 new SetClawCommand(claw, ClawServo.ServoPositions.safe),
@@ -352,7 +365,7 @@ public class TeleOp extends CommandOpMode {
 
         new GamepadButton(driverGamepad, GamepadKeys.Button.BACK).whenPressed(
                 new InstantCommand(()->{
-                    bot.toggleMode();
+                    bot.getDrivetrain().odo.resetPosAndIMU();
                 })
         );
 
