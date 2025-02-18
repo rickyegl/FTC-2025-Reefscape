@@ -40,6 +40,8 @@ public class MecanumDrivetrain extends SubsystemBase {
 
     private static final double hangCM = 45.0;
 
+    private double speed = 1;
+
     public MecanumDrivetrain(Bot bot) {
         this.bot = bot;
 
@@ -89,16 +91,26 @@ public class MecanumDrivetrain extends SubsystemBase {
 
     @Override
     public void periodic() {
+
+        if(bot.driver.getButton(GamepadKeys.Button.RIGHT_BUMPER)){
+            speed = 0.25;
+        }else if(bot.driver.getButton(GamepadKeys.Button.LEFT_BUMPER)){
+            speed = 0.5;
+        }else{
+            speed = 1;
+        }
+
+
         if (isEncoderMode) {
             double targetTicks = setPointCM * TICKS_PER_CM;
 
             double leftPower = ascentController.calculate(backLeft.getCurrentPosition(), targetTicks);
             double rightPower = ascentController.calculate(backRight.getCurrentPosition(), targetTicks);
 
-            backLeft.setPower(leftPower);
-            backRight.setPower(rightPower);
-            frontLeft.setPower(leftPower);
-            frontRight.setPower(rightPower);
+            backLeft.setPower(leftPower*speed);
+            backRight.setPower(rightPower*speed);
+            frontLeft.setPower(leftPower*speed);
+            frontRight.setPower(rightPower*speed);
 
             // Debugging telemetry
             //bot.telem.addData("BAD BAD BAD BAD BAD FUNNY", targetTicks);
@@ -124,11 +136,11 @@ public class MecanumDrivetrain extends SubsystemBase {
 
             //double extensionPosition = bot.getExtension().getPositionCM();
             if(bot.driver.getButton(GamepadKeys.Button.RIGHT_BUMPER)) {
-                multiplier *= 0.25;  // Velocidad reducida al 25%
+                multiplier = 0.25;  // Velocidad reducida al 25%
             } else if(bot.driver.getButton(GamepadKeys.Button.LEFT_BUMPER)) {
-                multiplier *= 0.5;   // Velocidad reducida al 50%
+                multiplier = 0.5;   // Velocidad reducida al 50%
             } else {
-                multiplier *= 1;
+                multiplier = 1;
             }
 
             double extensionThreshold = 20;

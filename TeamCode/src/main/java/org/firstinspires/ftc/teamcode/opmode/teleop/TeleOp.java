@@ -363,11 +363,11 @@ public class TeleOp extends CommandOpMode {
                 })
         );
 
-        new GamepadButton(driverGamepad, GamepadKeys.Button.BACK).whenPressed(
-                new InstantCommand(()->{
-                    bot.getDrivetrain().odo.resetPosAndIMU();
-                })
-        );
+            new GamepadButton(driverGamepad, GamepadKeys.Button.BACK).whenPressed(
+                    new InstantCommand(()->{
+                        bot.getDrivetrain().odo.resetPosAndIMU();
+                    })
+            );
 
         new GamepadButton(operatorGamepad, GamepadKeys.Button.DPAD_UP).whenPressed(
                 new InstantCommand(()->{
