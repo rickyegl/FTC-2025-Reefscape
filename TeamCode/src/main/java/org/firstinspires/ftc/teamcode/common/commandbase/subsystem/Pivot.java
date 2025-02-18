@@ -33,8 +33,8 @@ public class Pivot extends SubsystemBase {
         pivotMotorL = bot.hMap.get(DcMotor.class, "angleML");
         pivotMotorR = bot.hMap.get(DcMotor.class, "angleMR");
 
-        pivotMotorL.setDirection(DcMotorSimple.Direction.FORWARD);
-        pivotMotorR.setDirection(DcMotorSimple.Direction.REVERSE);
+        pivotMotorL.setDirection(DcMotorSimple.Direction.REVERSE);
+        pivotMotorR.setDirection(DcMotorSimple.Direction.FORWARD);
 
         //pivotEncoder = new AbsoluteAnalogEncoder(
         //        bot.hMap.get(AnalogInput.class, "pivotEncoder")
@@ -63,8 +63,8 @@ public class Pivot extends SubsystemBase {
                 getPositionDEG(),
                 setpointDEG
         );
-        pivotMotorR.setPower(-power);
-        //pivotMotorL.setPower(power*.30);
+        //pivotMotorR.setPower(-power);
+        pivotMotorL.setPower(-power);
 
 
         bot.telem.addData("Pivot Angle", getPositionDEG());
