@@ -331,7 +331,7 @@ public class TeleOp extends CommandOpMode {
                                         new SetClawCommand(claw, ClawServo.ServoPositions.safe),
                                         new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_vertical),
                                         new SetExtensionCommand(extension, claw, extension.getSamplesTarget()),
-                                        new WaitCommand(5000),
+                                        //new WaitCommand(5000),
                                         new SetClawCommand(claw, ClawServo.ServoPositions.placing)
                                 ),
                                 () -> bot.getMode() == Bot.Modes.SPECIMENS
