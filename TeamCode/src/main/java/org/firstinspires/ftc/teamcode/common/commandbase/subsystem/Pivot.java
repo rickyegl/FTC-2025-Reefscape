@@ -118,7 +118,7 @@ public class Pivot extends SubsystemBase {
     /**
      * Get the current position of the pivot in radians
      * @return the position in radians
-     */
+     */ 
     public double getPositionRAD() {
         return ((pivotMotorL.getCurrentPosition() / 8192.0) * 2 * Math.PI);
     }

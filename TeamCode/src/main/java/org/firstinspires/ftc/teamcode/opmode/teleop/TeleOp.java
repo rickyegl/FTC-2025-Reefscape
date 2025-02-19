@@ -20,6 +20,8 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.BotState;
 import org.firstinspires.ftc.teamcode.common.Bot;
+import org.firstinspires.ftc.teamcode.common.commandbase.actions.PutSpecimen3;
+import org.firstinspires.ftc.teamcode.common.commandbase.actions.StartDepositSpecimen2v2;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.claw.SetClawCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.drive.TeleOpDriveCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.extension.ManualExtensionCommand;
@@ -31,6 +33,7 @@ import org.firstinspires.ftc.teamcode.common.commandbase.command.intake.IntakeSt
 import org.firstinspires.ftc.teamcode.common.commandbase.command.pivot.ManualPivotCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.pivot.SetPivotAngleCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.state.SetBotStateCommand;
+import org.firstinspires.ftc.teamcode.common.commandbase.command.state.SetGamepadLight;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.ClawServo;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Extension;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Intake;
@@ -300,12 +303,7 @@ public class TeleOp extends CommandOpMode {
                                         //if depositing
                                         new ConditionalCommand(
                                                 //Put Specimen
-                                                new SequentialCommandGroup(
-                                                        new SetExtensionCommand(extension, claw, extension.getSetpointCM()-300),
-                                                        new IntakeOutCommand(intake),
-                                                        new WaitCommand(5000),
-                                                        new IntakeStopCommand(intake)
-                                                ),
+                                                new StartDepositSpecimen2v2(bot),
                                                 //Put Sample
                                                 new SequentialCommandGroup(
                                                         new IntakeOutCommand(intake),
@@ -335,6 +333,7 @@ public class TeleOp extends CommandOpMode {
                                         new SetClawCommand(claw, ClawServo.ServoPositions.safe),
                                         new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_vertical),
                                         new SetExtensionCommand(extension, claw, extension.getBarTarget()),
+                                        new SetClawCommand(claw, ClawServo.ServoPositions.placing-0.2),
                                         new SetClawCommand(claw, ClawServo.ServoPositions.placing)
                                 ),
                                 //Samples
@@ -362,15 +361,12 @@ public class TeleOp extends CommandOpMode {
 
         //endregion
 
-        //region Intake
-
-        //endregion
-
         //region Settings
 
         new GamepadButton(operatorGamepad, GamepadKeys.Button.BACK).whenPressed(
                 new InstantCommand(()->{
                     bot.toggleMode();
+                    new SetGamepadLight(bot, operatorGamepad);
                 })
         );
 
