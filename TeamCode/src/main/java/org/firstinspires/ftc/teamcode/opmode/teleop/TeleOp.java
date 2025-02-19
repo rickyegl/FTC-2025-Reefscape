@@ -35,6 +35,7 @@ import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.ClawServo;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Extension;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Intake;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.MecanumDrivetrain;
+import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Palito;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Pivot;
 import org.firstinspires.ftc.teamcode.Direction;
 
@@ -48,6 +49,7 @@ public class TeleOp extends CommandOpMode {
     private ClawServo claw;
     private MecanumDrivetrain drivetrain;
     private boolean enableDrive = true;
+    private Palito palo;
 
     private GamepadEx driverGamepad;
     private GamepadEx operatorGamepad;
@@ -93,8 +95,10 @@ public class TeleOp extends CommandOpMode {
         register(drivetrain);
         drivetrain.setDefaultCommand(driveCommand);
 
+        palo = bot.getPalo();
         intake = bot.getIntake();
         claw = bot.getClaw();
+        register(palo);
         register(intake);
         register(claw);
 
@@ -182,6 +186,13 @@ public class TeleOp extends CommandOpMode {
                                 drivetrain.setHeadingLock(false);
                             })
                     );
+            new GamepadButton(driverGamepad,GamepadKeys.Button.A).whenPressed(
+                    new SequentialCommandGroup(
+                            new InstantCommand(palo::out),
+                            new WaitCommand(250),
+                            new InstantCommand(palo::in)
+                    )
+            );
         }
 
         //endregion

@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.ClawServo;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Extension;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Intake;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.MecanumDrivetrain;
+import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Palito;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Pivot;
 
 public class Bot extends Robot {
@@ -32,6 +33,8 @@ public class Bot extends Robot {
     private final Intake intake;
 
     private final ClawServo claw;
+
+    private Palito palo;
 
     private MecanumDrivetrain drivetrain;
 
@@ -106,6 +109,8 @@ public class Bot extends Robot {
     public BotState getState() { return state; }
 
     public void setState(BotState state) { this.state = state; }
+
+    public Palito getPalo() {return palo;}
 
     public Modes getMode() { return mode; }
 
