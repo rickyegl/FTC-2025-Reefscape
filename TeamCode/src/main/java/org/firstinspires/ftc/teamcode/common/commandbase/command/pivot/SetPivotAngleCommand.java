@@ -31,6 +31,13 @@ public class SetPivotAngleCommand extends CommandBase {
         addRequirements(pivot);
     }
 
+    public SetPivotAngleCommand(Pivot pivot, double setpointVertical, double angleDeg, boolean ignoreSafety, ClawServo claw) {
+        this.pivot = pivot;
+        this.angleDeg = angleDeg;
+        this.ignoreSafety = ignoreSafety;
+        this.claw = claw;
+    }
+
     @Override
     public void initialize() {
         new ConditionalCommand(

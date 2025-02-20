@@ -50,7 +50,7 @@ public class SampleAuto extends LinearOpMode {
     public static Pose startingPoseIntermediate = new Pose(34, 105, 0);
 
 
-    public static Pose score1 = new Pose( 12.551029235359252, 137.34585499200296, Math.toRadians(315));
+    public static Pose score1 = new Pose( 16, 127, Math.toRadians(315));
 
     public static Pose score2 = new Pose(20, 133.1034679809761, Math.toRadians(345.599123));
 
@@ -108,8 +108,12 @@ public class SampleAuto extends LinearOpMode {
                                 )
                                 .setLinearHeadingInterpolation(startingPose.getHeading(), startingPoseIntermediate.getHeading())
                                 .build()
+                        ),
+                        new ParallelCommandGroup(
+                                new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_horizontal),
+                                new SetClawCommand(claw, ClawServo.ServoPositions.safe),
+                                new SetExtensionCommand(extension, claw, Extension.minExtension)
                         )
-
                 ),
                 //endregion
                 new WaitCommand(1000),
@@ -128,11 +132,12 @@ public class SampleAuto extends LinearOpMode {
                                 .build()
                         ),
 
-                        new ParallelCommandGroup(
-                                new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_horizontal),
-                                new SetClawCommand(claw, ClawServo.ServoPositions.safe),
-                                new SetExtensionCommand(extension, claw, Extension.minExtension),
-                                new IntakeInCommand(intake)
+                        new SequentialCommandGroup(
+                                new SetPivotAngleCommand(pivot,claw, Pivot.setpoint_vertical),
+                                new SetClawCommand(claw, ClawServo.ServoPositions.safe2),
+                                new SetExtensionCommand(extension, claw, Extension.highBasketTarget),
+                                new WaitCommand(500),
+                                new IntakeOutCommand(intake)
                         )
 
                 ),
@@ -153,6 +158,8 @@ public class SampleAuto extends LinearOpMode {
                                 .build()
                         ),
                         new SequentialCommandGroup(
+                                new SetExtensionCommand(extension, claw, 0),
+                                new WaitCommand(500),
                                 new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_intaking),
                                 new SetClawCommand(claw, ClawServo.ServoPositions.safe),
                                 new SetExtensionCommand(extension, claw, Extension.intakeMaxExtension),

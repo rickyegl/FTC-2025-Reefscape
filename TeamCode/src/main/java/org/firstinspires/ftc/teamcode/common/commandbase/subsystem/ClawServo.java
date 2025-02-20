@@ -19,7 +19,7 @@ public class ClawServo extends SubsystemBase {
     private double currentPosition = ServoPositions.placing;
     @com.acmerobotics.dashboard.config.Config
     public static class ServoPositions {
-        public static double placing = 0.25, safe = 0, intaking = 0.5, safe2= 0;
+        public static double placing = 0.4, safe = 0, intaking = 0.7, safe2= 0.5;
     }
     public ClawServo(Bot bot) {
         this.bot = bot;
