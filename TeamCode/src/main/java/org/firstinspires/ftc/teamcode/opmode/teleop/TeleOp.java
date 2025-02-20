@@ -432,6 +432,43 @@ public class TeleOp extends CommandOpMode {
                         () -> bot.climbing
                 )
         );
+        new GamepadButton(driverGamepad, GamepadKeys.Button.DPAD_UP).whileActiveOnce(
+                new SequentialCommandGroup(
+                        new  ParallelCommandGroup(
+                                new SetExtensionCommand(extension,claw, 400),
+                                new SetPivotAngleCommand(pivot,claw, 24)
+                        ),
+                        new WaitCommand(4000),
+                        new SetExtensionCommand(extension,claw, 1000),
+                        new WaitCommand(1000),
+                        new SetExtensionCommand(extension,claw, 2100),
+                        new WaitCommand(1000),
+                        new SetPivotAngleCommand(pivot,claw,34),
+                        new WaitCommand(1000),
+                        new SetExtensionCommand(extension,claw, 2000),
+                        new WaitCommand(1000),
+                        new SetPivotAngleCommand(pivot,claw, 108),
+                        new WaitCommand(1000),
+                        new SetPivotAngleCommand(pivot,claw, 0),
+                        new WaitCommand(1000),
+                        new SetExtensionCommand(extension,claw, 0),
+                        new WaitCommand(1000),
+                        new SetPivotAngleCommand(pivot,claw, 108 )
+
+
+
+
+
+
+
+                )
+
+
+        );
+
+        
+
+
 
         //endregion
 
