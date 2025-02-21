@@ -28,6 +28,7 @@ import org.firstinspires.ftc.teamcode.common.commandbase.command.intake.IntakeIn
 import org.firstinspires.ftc.teamcode.common.commandbase.command.intake.IntakeOutCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.intake.IntakeStopCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.pivot.SetPivotAngleCommand;
+import org.firstinspires.ftc.teamcode.common.commandbase.command.safe.WaitUntilExtend;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.ClawPID;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.ClawServo;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Extension;
@@ -50,7 +51,7 @@ public class SampleAuto extends LinearOpMode {
     public static Pose startingPoseIntermediate = new Pose(34, 105, 0);
 
 
-    public static Pose score1 = new Pose( 16, 127, Math.toRadians(315));
+    public static Pose score1 = new Pose( 16   , 127, Math.toRadians(315));
 
     public static Pose score2 = new Pose(20, 133.1034679809761, Math.toRadians(345.599123));
 
@@ -119,7 +120,7 @@ public class SampleAuto extends LinearOpMode {
                 new WaitCommand(1000),
 
                 //region Score 1
-                new ParallelCommandGroup(
+                new SequentialCommandGroup(
                         new FollowPathCommand(f, f.pathBuilder()
                                 .addPath(
                                         new BezierLine(
@@ -136,7 +137,7 @@ public class SampleAuto extends LinearOpMode {
                                 new SetPivotAngleCommand(pivot,claw, Pivot.setpoint_vertical),
                                 new SetClawCommand(claw, ClawServo.ServoPositions.safe2),
                                 new SetExtensionCommand(extension, claw, Extension.highBasketTarget),
-                                new WaitCommand(500),
+                                new WaitUntilExtend(extension, Extension.highBasketTarget),
                                 new IntakeOutCommand(intake)
                         )
 
@@ -146,7 +147,7 @@ public class SampleAuto extends LinearOpMode {
                 new WaitCommand(1000),
 
                 //region Pick 2
-                new ParallelCommandGroup(
+                new SequentialCommandGroup(
                         new FollowPathCommand(f, f.pathBuilder()
                                 .addPath(
                                         new BezierLine(
@@ -159,10 +160,12 @@ public class SampleAuto extends LinearOpMode {
                         ),
                         new SequentialCommandGroup(
                                 new SetExtensionCommand(extension, claw, 0),
-                                new WaitCommand(500),
+                                new WaitUntilExtend(extension, 0),
                                 new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_intaking),
                                 new SetClawCommand(claw, ClawServo.ServoPositions.safe),
                                 new SetExtensionCommand(extension, claw, Extension.intakeMaxExtension),
+                                new WaitUntilExtend(extension, Extension.intakeMaxExtension),
+                                new SetClawCommand(claw, ClawServo.ServoPositions.intaking),
                                 new IntakeInCommand(intake)
                         )
 
@@ -187,9 +190,10 @@ public class SampleAuto extends LinearOpMode {
                         new SequentialCommandGroup(
                                 new SetClawCommand(claw, ClawServo.ServoPositions.safe),
                                 new SetExtensionCommand(extension, claw, Extension.minExtension),
-                                new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_vertical),
+                                new SetPivotAngleCommand(pivot,claw, Pivot.setpoint_vertical),
+                                new SetClawCommand(claw, ClawServo.ServoPositions.safe2),
                                 new SetExtensionCommand(extension, claw, Extension.highBasketTarget),
-                                new SetClawCommand(claw, ClawServo.ServoPositions.placing),
+                                new WaitUntilExtend(extension, Extension.highBasketTarget),
                                 new IntakeOutCommand(intake)
                         )
 
@@ -212,10 +216,16 @@ public class SampleAuto extends LinearOpMode {
                                 .build()
                         ),
                         new SequentialCommandGroup(
-                                new SetClawCommand(claw, ClawServo.ServoPositions.safe),
-                                new SetExtensionCommand(extension, claw, Extension.minExtension),
+                                new SetExtensionCommand(extension, claw, 0),
+                                new WaitUntilExtend(extension, 0),
+
                                 new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_intaking),
+                                new SetClawCommand(claw, ClawServo.ServoPositions.safe),
+
                                 new SetExtensionCommand(extension, claw, Extension.intakeMaxExtension),
+                                new WaitUntilExtend(extension, Extension.intakeMaxExtension),
+
+                                new SetClawCommand(claw, ClawServo.ServoPositions.intaking),
                                 new IntakeInCommand(intake)
                         )
                 ),
@@ -239,9 +249,13 @@ public class SampleAuto extends LinearOpMode {
                         new SequentialCommandGroup(
                                 new SetClawCommand(claw, ClawServo.ServoPositions.safe),
                                 new SetExtensionCommand(extension, claw, Extension.minExtension),
-                                new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_vertical),
+                                new WaitUntilExtend(extension, Extension.minExtension),
+
+                                new SetPivotAngleCommand(pivot,claw, Pivot.setpoint_vertical),
+                                new SetClawCommand(claw, ClawServo.ServoPositions.safe2),
+
                                 new SetExtensionCommand(extension, claw, Extension.highBasketTarget),
-                                new SetClawCommand(claw, ClawServo.ServoPositions.placing),
+                                new WaitUntilExtend(extension, Extension.highBasketTarget),
                                 new IntakeOutCommand(intake)
                         )
                 ),
@@ -263,10 +277,16 @@ public class SampleAuto extends LinearOpMode {
                                 .build()
                         ),
                         new SequentialCommandGroup(
-                                new SetClawCommand(claw, ClawServo.ServoPositions.safe),
-                                new SetExtensionCommand(extension, claw, Extension.minExtension),
+                                new SetExtensionCommand(extension, claw, 0),
+                                new WaitUntilExtend(extension, 0),
+
                                 new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_intaking),
+                                new SetClawCommand(claw, ClawServo.ServoPositions.safe),
+
                                 new SetExtensionCommand(extension, claw, Extension.intakeMaxExtension),
+                                new WaitUntilExtend(extension, Extension.intakeMaxExtension),
+
+                                new SetClawCommand(claw, ClawServo.ServoPositions.intaking),
                                 new IntakeInCommand(intake)
                         )
                 ),
@@ -290,9 +310,13 @@ public class SampleAuto extends LinearOpMode {
                         new SequentialCommandGroup(
                                 new SetClawCommand(claw, ClawServo.ServoPositions.safe),
                                 new SetExtensionCommand(extension, claw, Extension.minExtension),
-                                new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_vertical),
-                                new SetExtensionCommand(extension, claw, Extension.highBasketTarget),
-                                new SetClawCommand(claw, ClawServo.ServoPositions.placing),
+                                new WaitUntilExtend(extension, Extension.minExtension),
+
+                                new SetPivotAngleCommand(pivot,claw, Pivot.setpoint_vertical),
+                                new SetClawCommand(claw, ClawServo.ServoPositions.safe2),
+
+                                new SetExtensionCommand(extension, claw, 1000),
+                                new WaitUntilExtend(extension, Extension.highBasketTarget),
                                 new IntakeOutCommand(intake)
                         )
                 ),

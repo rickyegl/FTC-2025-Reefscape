@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmode.teleop;
 
+import android.graphics.drawable.AnimationDrawable;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.CommandOpMode;
@@ -17,6 +19,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.arcrobotics.ftclib.geometry.Vector2d;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.BotState;
 import org.firstinspires.ftc.teamcode.common.Bot;
@@ -49,6 +52,7 @@ public class TeleOp extends CommandOpMode {
     private Extension extension;
     private Intake intake;
     private ClawServo claw;
+    private Servo Patlito;
     private MecanumDrivetrain drivetrain;
     private boolean enableDrive = true;
 
@@ -69,6 +73,7 @@ public class TeleOp extends CommandOpMode {
         driverGamepad = new GamepadEx(gamepad1);
         //operatorGamepad = driverGamepad;
         operatorGamepad = new GamepadEx(gamepad2);
+
 
         //gamepad1.setLedColor(255, 255, 0, Gamepad.LED_DURATION_CONTINUOUS);
 
@@ -96,13 +101,14 @@ public class TeleOp extends CommandOpMode {
         register(drivetrain);
         drivetrain.setDefaultCommand(driveCommand);
 
+        Patlito = bot.hMap.get(Servo.class, "palito");
         intake = bot.getIntake();
         claw = bot.getClaw();
         register(intake);
         register(claw);
 
          //region HLock
-        double basketAngle = 180+45;
+        /*double basketAngle = 180+45;
         double transformangle = -45;
 
         new GamepadButton(driverGamepad, GamepadKeys.Button.DPAD_UP)
@@ -162,7 +168,7 @@ public class TeleOp extends CommandOpMode {
                             })
                     );
 
-            new GamepadButton(driverGamepad, GamepadKeys.Button.A)
+            /*new GamepadButton(driverGamepad, GamepadKeys.Button.A)
                     .whileHeld(
                             new InstantCommand(()->{
                                 drivetrain.setTargetHeadingDEG(180);
@@ -172,7 +178,7 @@ public class TeleOp extends CommandOpMode {
                             new  InstantCommand(()->{
                                 drivetrain.setHeadingLock(false);
                             })
-                    );
+                    );*
 
             new GamepadButton(driverGamepad, GamepadKeys.Button.X)
                     .whileHeld(
@@ -185,7 +191,7 @@ public class TeleOp extends CommandOpMode {
                                 drivetrain.setHeadingLock(false);
                             })
                     );
-        }
+        }*/
 
         //endregion
 
@@ -246,12 +252,48 @@ public class TeleOp extends CommandOpMode {
                         )
                 );
 
+        new GamepadButton(operatorGamepad, GamepadKeys.Button.LEFT_BUMPER)
+                .whenPressed(
+                        new SetClawCommand(claw, ClawServo.ServoPositions.specimen)
+                )
+        ;
+
+        new GamepadButton(operatorGamepad, GamepadKeys.Button.RIGHT_BUMPER)
+                .whenPressed(
+                        new SetClawCommand(claw, ClawServo.ServoPositions.safe)
+                )
+        ;
+
         register(extension);
         //extension.setDefaultCommand(extensionCommand);
         intake.setDefaultCommand(intakeCommand);
         //endregion
 
         //region Actions
+
+
+        new GamepadButton(driverGamepad, GamepadKeys.Button.A)
+                .whenPressed(
+                        new SequentialCommandGroup(
+                                new InstantCommand(() -> {
+                                    Patlito.setPosition(0.8);
+
+                                }),
+                                new WaitCommand(100),
+                                new InstantCommand(() -> {
+                                    Patlito.setPosition(0);
+                                }
+                                )
+                        )
+                );
+        new GamepadButton(operatorGamepad, GamepadKeys.Button.A)
+                .whenPressed(
+                       new SequentialCommandGroup(
+                                new SetExtensionCommand(extension,claw, 0),
+                               new SetPivotAngleCommand(pivot,claw, 85)
+
+                        )
+                );
 
 
         new GamepadButton(operatorGamepad, GamepadKeys.Button.B)

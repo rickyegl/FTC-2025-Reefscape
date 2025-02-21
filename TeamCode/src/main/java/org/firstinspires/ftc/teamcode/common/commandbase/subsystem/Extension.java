@@ -18,6 +18,7 @@ public class Extension extends SubsystemBase {
     private final PIDFController extensionController;
     public static double setpointCM = 0.0, highBarTarget = 800.0, lowBarTarget = 17.0, lowBasketTarget = 20.0, highBasketTarget = 3250, ticksperCM = 1;//10.37339803;
     public static double minExtension = 0.0, depositMaxExtension = 30, intakeMaxExtension = 1367;
+    public static double offset = 30;
     public double getBarTarget() {
         if (bot.getLevel() == Bot.Levels.Up) {
             return highBarTarget;
@@ -121,6 +122,10 @@ public class Extension extends SubsystemBase {
     }
     public void resetP(){
         extensionController.setP(Config.extension_kP);
+    }
+
+    public boolean atTarget(double target){
+        return getPositionCM() >= target - offset || getPositionCM() <= target + offset;
     }
 
 }
