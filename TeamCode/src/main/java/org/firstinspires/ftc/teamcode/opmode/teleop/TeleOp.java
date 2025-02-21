@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.opmode.teleop;
 
-import android.graphics.drawable.AnimationDrawable;
-
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.CommandOpMode;
@@ -16,21 +14,15 @@ import com.arcrobotics.ftclib.command.button.Button;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
-import com.arcrobotics.ftclib.geometry.Vector2d;
-import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.BotState;
 import org.firstinspires.ftc.teamcode.common.Bot;
-import org.firstinspires.ftc.teamcode.common.commandbase.actions.PutSpecimen3;
 import org.firstinspires.ftc.teamcode.common.commandbase.actions.StartDepositSpecimen2v2;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.claw.SetClawCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.drive.TeleOpDriveCommand;
-import org.firstinspires.ftc.teamcode.common.commandbase.command.extension.ManualExtensionCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.extension.ManualIntakeCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.extension.SetExtensionCommand;
-import org.firstinspires.ftc.teamcode.common.commandbase.command.intake.IntakeInCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.intake.IntakeOutCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.intake.IntakeStopCommand;
 import org.firstinspires.ftc.teamcode.common.commandbase.command.pivot.ManualPivotCommand;
@@ -52,7 +44,7 @@ public class TeleOp extends CommandOpMode {
     private Extension extension;
     private Intake intake;
     private ClawServo claw;
-    private Servo Patlito;
+    private Servo Palito;
     private MecanumDrivetrain drivetrain;
     private boolean enableDrive = true;
 
@@ -101,7 +93,7 @@ public class TeleOp extends CommandOpMode {
         register(drivetrain);
         drivetrain.setDefaultCommand(driveCommand);
 
-        Patlito = bot.hMap.get(Servo.class, "palito");
+        Palito = bot.hMap.get(Servo.class, "palito");
         intake = bot.getIntake();
         claw = bot.getClaw();
         register(intake);
@@ -274,18 +266,25 @@ public class TeleOp extends CommandOpMode {
 
         new GamepadButton(driverGamepad, GamepadKeys.Button.A)
                 .whenPressed(
-                        new SequentialCommandGroup(
+                        /*new SequentialCommandGroup(
                                 new InstantCommand(() -> {
-                                    Patlito.setPosition(0.8);
+                                    Palito.setPosition(0.8);
 
                                 }),
                                 new WaitCommand(100),
                                 new InstantCommand(() -> {
-                                    Patlito.setPosition(0);
+                                    Palito.setPosition(0);
                                 }
                                 )
-                        )
+                        )*/
+
+                        new InstantCommand(() ->{ Palito.setPosition(0.8);})
+                )
+                .whenReleased(
+                        new InstantCommand(() -> {Palito.setPosition(0);})
                 );
+
+
         new GamepadButton(operatorGamepad, GamepadKeys.Button.A)
                 .whenPressed(
                        new SequentialCommandGroup(
