@@ -21,7 +21,7 @@ public class Pivot extends SubsystemBase {
     public final DcMotor pivotMotorL;
     public final DcMotor pivotMotorR;
 
-    public static final double setpoint_intaking = 94, setpoint_vertical = 0, setpoint_horizontal = 85, setpoint_intaking_start = 80, setpoint_climb = 44;
+    public static final double setpoint_intaking2 = 104, setpoint_intaking = 94, setpoint_vertical = 0, setpoint_horizontal = 85, setpoint_intaking_start = 80, setpoint_climb = 44;
 
     private final PIDFController pivotController;
     public double setpointDEG = setpoint_horizontal, minAngle = 0.0, maxAngle = 107;
@@ -129,6 +129,10 @@ public class Pivot extends SubsystemBase {
 
     public void setSetpointVertical() {
         setpointDEG = setpoint_vertical;
+    }
+    public void setSetpointIntaking() {
+        setpointDEG = setpoint_intaking;
+        periodic();
     }
 
     public void multiplyP(){

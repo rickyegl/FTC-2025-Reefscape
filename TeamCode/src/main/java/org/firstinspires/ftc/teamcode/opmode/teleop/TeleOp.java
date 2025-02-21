@@ -189,10 +189,6 @@ public class TeleOp extends CommandOpMode {
         //region Pivot
         pivot = bot.getPivot();
 
-        Button pivotDownButton = (new GamepadButton(operatorGamepad, GamepadKeys.Button.DPAD_LEFT))
-                .whenPressed(
-                        new ManualPivotCommand(pivot, Direction.DOWN)
-                );
         Button pivotUpButton = (new GamepadButton(operatorGamepad, GamepadKeys.Button.DPAD_RIGHT))
                 .whenPressed(
                         new ManualPivotCommand(pivot, Direction.UP)
@@ -258,6 +254,12 @@ public class TeleOp extends CommandOpMode {
                                 //new IntakeInCommand(intake),
                                 new SetClawCommand(claw, ClawServo.ServoPositions.intaking),
                                 new SetExtensionCommand(extension, claw, Extension.intakeMaxExtension)
+                        )
+                );
+        new GamepadButton(operatorGamepad, GamepadKeys.Button.DPAD_LEFT)
+                .whileActiveOnce(
+                        new SequentialCommandGroup(
+                                new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_intaking2)
                         )
                 );
 
@@ -387,8 +389,8 @@ public class TeleOp extends CommandOpMode {
         new GamepadButton(operatorGamepad, GamepadKeys.Button.LEFT_STICK_BUTTON).whileActiveOnce(
                 new SequentialCommandGroup(
                         new ParallelCommandGroup(
-                                new SetExtensionCommand(extension, claw, 1325),
-                                new SetPivotAngleCommand(pivot,claw,39)
+                                new SetExtensionCommand(extension, claw, 2100),
+                                new SetPivotAngleCommand(pivot,claw,30)
                         ),
                         new WaitUntilCommand(()->operatorGamepad.getButton(GamepadKeys.Button.RIGHT_STICK_BUTTON)),
                         new InstantCommand(()->{

@@ -108,6 +108,17 @@ public class Extension extends SubsystemBase {
         return intakeMaxExtension;
     }
 
+    public void getHighBasketTarget() {
+        setpointCM = highBasketTarget;
+    }
+    public void maxExtension() {
+        minExtension = getMaxExtension();
+    }
+    public void minExtension() {
+        minExtension = getMinExtension();
+    }
+
+
     /**
      * Get the minimum extension of the extension in centimeters
      * @return the minimum extension of the extension in centimeters
