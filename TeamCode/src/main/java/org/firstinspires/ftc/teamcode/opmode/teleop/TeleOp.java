@@ -252,7 +252,7 @@ public class TeleOp extends CommandOpMode {
 
         new GamepadButton(operatorGamepad, GamepadKeys.Button.RIGHT_BUMPER)
                 .whenPressed(
-                        new SetClawCommand(claw, ClawServo.ServoPositions.safe)
+                        new SetClawCommand(claw, ClawServo.ServoPositions.safe2)
                 )
         ;
 
@@ -278,10 +278,10 @@ public class TeleOp extends CommandOpMode {
                                 )
                         )*/
 
-                        new InstantCommand(() ->{ Palito.setPosition(0.8);})
+                        new InstantCommand(() ->{ Palito.setPosition(0);})
                 )
                 .whenReleased(
-                        new InstantCommand(() -> {Palito.setPosition(0);})
+                        new InstantCommand(() -> {Palito.setPosition(0.8);})
                 );
 
 
@@ -338,7 +338,7 @@ public class TeleOp extends CommandOpMode {
                                                 new SequentialCommandGroup(
                                                         new IntakeOutCommand(intake),
                                                         new WaitCommand(700),
-                                                        new SetClawCommand(claw,ClawServo.ServoPositions.safe2),
+                                                        new SetClawCommand(claw,ClawServo.ServoPositions.pickSpecimen),
                                                         new IntakeStopCommand(intake),
                                                         new WaitCommand(200),
                                                         new SetExtensionCommand(extension, claw, 0)
@@ -364,7 +364,9 @@ public class TeleOp extends CommandOpMode {
                                         new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_vertical),
                                         new SetExtensionCommand(extension, claw, extension.getBarTarget()),
                                         new SetClawCommand(claw, ClawServo.ServoPositions.placing-0.2),
-                                        new SetClawCommand(claw, ClawServo.ServoPositions.placing)
+                                        new WaitCommand(500),
+                                        new SetClawCommand(claw, ClawServo.ServoPositions.placing),
+                                        new SetExtensionCommand(extension, claw, Extension.highBarTarget + 10)
                                 ),
                                 //Samples
                                 new SequentialCommandGroup(
@@ -424,8 +426,8 @@ public class TeleOp extends CommandOpMode {
         new GamepadButton(operatorGamepad, GamepadKeys.Button.LEFT_STICK_BUTTON).whileActiveOnce(
                 new SequentialCommandGroup(
                         new ParallelCommandGroup(
-                                new SetExtensionCommand(extension, claw, 1325),
-                                new SetPivotAngleCommand(pivot,claw,39)
+                                new SetExtensionCommand(extension, claw, 2100),
+                                new SetPivotAngleCommand(pivot,claw,36)
                         ),
                         new WaitUntilCommand(()->operatorGamepad.getButton(GamepadKeys.Button.RIGHT_STICK_BUTTON)),
                         new InstantCommand(()->{

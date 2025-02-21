@@ -9,7 +9,6 @@ import com.arcrobotics.ftclib.command.WaitCommand;
 import org.firstinspires.ftc.teamcode.common.Config;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.ClawServo;
 import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Extension;
-import org.firstinspires.ftc.teamcode.common.commandbase.subsystem.Pivot;
 
 /**
  * SetExtensionCommand is a command that sets the extension to a specific setpoint
@@ -46,7 +45,7 @@ public class SetExtensionCommand extends CommandBase {
                             extension.setSetpointCM(setpoint);
                         })
                 ),
-                ()->claw.clawPivot.getPosition()!= ClawServo.ServoPositions.safe2
+                ()->claw.clawPivot.getPosition()!= ClawServo.ServoPositions.pickSpecimen
 
         ).schedule();
     }

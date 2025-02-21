@@ -128,7 +128,7 @@ public class SampleAuto extends LinearOpMode {
 
                         new SequentialCommandGroup(
                                 new SetPivotAngleCommand(pivot,claw, Pivot.setpoint_vertical),
-                                new SetClawCommand(claw, ClawServo.ServoPositions.safe2),
+                                new SetClawCommand(claw, ClawServo.ServoPositions.pickSpecimen),
                                 new SetExtensionCommand(extension, claw, Extension.highBasketTarget),
                                 new IntakeOutCommand(intake)
                         )
@@ -181,7 +181,7 @@ public class SampleAuto extends LinearOpMode {
                                 new SetClawCommand(claw, ClawServo.ServoPositions.safe),
                                 new SetExtensionCommand(extension, claw, Extension.minExtension),
                                 new SetPivotAngleCommand(pivot,claw, Pivot.setpoint_vertical),
-                                new SetClawCommand(claw, ClawServo.ServoPositions.safe2),
+                                new SetClawCommand(claw, ClawServo.ServoPositions.pickSpecimen),
                                 new SetExtensionCommand(extension, claw, Extension.highBasketTarget),
                                 new IntakeOutCommand(intake)
                         )
@@ -238,7 +238,7 @@ public class SampleAuto extends LinearOpMode {
                                 new SetExtensionCommand(extension, claw, Extension.minExtension),
 
                                 new SetPivotAngleCommand(pivot,claw, Pivot.setpoint_vertical),
-                                new SetClawCommand(claw, ClawServo.ServoPositions.safe2),
+                                new SetClawCommand(claw, ClawServo.ServoPositions.pickSpecimen),
 
                                 new SetExtensionCommand(extension, claw, Extension.highBasketTarget),
                                 new IntakeOutCommand(intake)
@@ -295,7 +295,7 @@ public class SampleAuto extends LinearOpMode {
                                 new SetExtensionCommand(extension, claw, Extension.minExtension),
 
                                 new SetPivotAngleCommand(pivot,claw, Pivot.setpoint_vertical),
-                                new SetClawCommand(claw, ClawServo.ServoPositions.safe2),
+                                new SetClawCommand(claw, ClawServo.ServoPositions.pickSpecimen),
 
                                 new SetExtensionCommand(extension, claw, 1000),
                                 new IntakeOutCommand(intake)
@@ -338,6 +338,7 @@ public class SampleAuto extends LinearOpMode {
             CommandScheduler.getInstance().run();
             f.update();
             f.telemetryDebug(telem);
+            extension.periodic();
         }
     }
 }

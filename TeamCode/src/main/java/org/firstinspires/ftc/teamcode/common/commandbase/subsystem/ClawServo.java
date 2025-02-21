@@ -1,12 +1,6 @@
 package org.firstinspires.ftc.teamcode.common.commandbase.subsystem;
 
-import static org.firstinspires.ftc.teamcode.common.commandbase.subsystem.ClawPID.ServoPIDConfig.d;
-import static org.firstinspires.ftc.teamcode.common.commandbase.subsystem.ClawPID.ServoPIDConfig.p;
-
 import com.arcrobotics.ftclib.command.SubsystemBase;
-import com.arcrobotics.ftclib.controller.PDController;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.common.Bot;
@@ -19,7 +13,7 @@ public class ClawServo extends SubsystemBase {
     private double currentPosition = ServoPositions.placing;
     @com.acmerobotics.dashboard.config.Config
     public static class ServoPositions {
-        public static double placing = 0.45, safe = 0, intaking = 0.75, safe2= 0.5, specimen = 0.7;
+        public static double placing = 0.45, safe = 0, intaking = 0.75, pickSpecimen = 0.3, specimen = 0.7, safe2 = 0.25;
     }
     public ClawServo(Bot bot) {
         this.bot = bot;
