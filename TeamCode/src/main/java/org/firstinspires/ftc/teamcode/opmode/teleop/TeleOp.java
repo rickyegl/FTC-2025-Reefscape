@@ -362,11 +362,8 @@ public class TeleOp extends CommandOpMode {
                                 new SequentialCommandGroup(
                                         new SetClawCommand(claw, ClawServo.ServoPositions.safe),
                                         new SetPivotAngleCommand(pivot, claw, Pivot.setpoint_vertical),
-                                        new SetExtensionCommand(extension, claw, extension.getBarTarget()),
-                                        new SetClawCommand(claw, ClawServo.ServoPositions.placing-0.2),
-                                        new WaitCommand(500),
-                                        new SetClawCommand(claw, ClawServo.ServoPositions.placing),
-                                        new SetExtensionCommand(extension, claw, Extension.highBarTarget + 10)
+                                        new SetExtensionCommand(extension, claw, Extension.highBarTarget/2),
+                                        new SetClawCommand(claw, ClawServo.ServoPositions.specimen)
                                 ),
                                 //Samples
                                 new SequentialCommandGroup(
@@ -379,6 +376,18 @@ public class TeleOp extends CommandOpMode {
                                 () -> bot.getMode() == Bot.Modes.SPECIMENS
                         )
 
+                )
+                .whenReleased(
+                        new ConditionalCommand(
+                                new SequentialCommandGroup(
+                                new SetExtensionCommand(extension, claw, extension.getBarTarget()),
+                                new SetClawCommand(claw, ClawServo.ServoPositions.placing),
+                                new WaitCommand(500),
+                                new SetExtensionCommand(extension, claw, Extension.highBarTarget + 30)
+                                ),
+                                 new WaitCommand(0),
+                                () -> bot.getMode() == Bot.Modes.SPECIMENS
+                        )
                 );
 
         //extension release
